@@ -1,0 +1,61 @@
+<!-- Enhanced all_users.html template -->
+{% extends 'base.html' %}
+{% block title %}All Users{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>👥 All Users</h2>
+    <div class="row">
+        {% for user in users %}
+        <div class="col-md-4 col-sm-6 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    {% if user.profile.profile_picture %}
+                        <img src="{{ user.profile.profile_picture.url }}" 
+                             class="rounded-circle mb-3" 
+                             style="width: 80px; height: 80px; object-fit: cover;"
+                             alt="{{ user.username }}'s profile">
+                    {% else %}
+                        <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center mb-3 mx-auto" 
+                             style="width: 80px; height: 80px;">
+                            <i class="fas fa-user text-white fa-2x"></i>
+                        </div>
+                    {% endif %}
+                    
+                    <h5 class="card-title">@{{ user.username }}</h5>
+                    
+                    {% if user.first_name or user.last_name %}
+                        <p class="text-muted">{{ user.first_name }} {{ user.last_name }}</p>
+                    {% endif %}
+                    
+                    <div class="mb-3">
+                        <form action="{% url 'toggle_follow' user.username %}" method="post" style="display: inline;">
+                            {% csrf_token %}
+                            {% if user.id in following_ids %}
+                                <button type="submit" class="btn btn-outline-danger btn-sm">
+                                    <i class="fas fa-user-minus"></i> Unfollow
+                                </button>
+                            {% else %}
+                                <button type="submit" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-user-plus"></i> Follow
+                                </button>
+                            {% endif %}
+                        </form>
+                    </div>
+                    
+                    <a href="{% url 'user_profile' user.username %}" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-eye"></i> View Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="text-center">
+                <p class="text-muted">No users found.</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

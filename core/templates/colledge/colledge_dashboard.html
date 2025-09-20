@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block title %}Colledge Dashboard{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4>{{ colledge.name }}</h4>
+                </div>
+                <div class="card-body">
+                    <p><strong>Description:</strong> {{ colledge.description }}</p>
+                    <p><strong>Rules:</strong> {{ colledge.rules }}</p>
+                    <p><strong>Status:</strong> {% if colledge.is_active %}<span class="text-success">Active</span>{% if is_owner and countdown %}
+                        <span id="colledge-countdown" class="ms-2"></span>
+                        <script>
+                        var countdown = Number("{{ countdown|default:0 }}");
+                        function formatCountdown(secs) {
+                            var d = Math.floor(secs / (3600*24));
+                            var h = Math.floor((secs % (3600*24)) / 3600);
+                            var m = Math.floor((secs % 3600) / 60);
+                            var s = secs % 60;
+                            return `${d}d ${h}h ${m}m ${s}s`;
+                        }
+                        function updateCountdown() {
+                            var el = document.getElementById('colledge-countdown');
+                            if (countdown > 0) {
+                                el.textContent = 'Expires in: ' + formatCountdown(countdown);
+                                countdown--;
+                            } else {
+                                el.textContent = 'Expired';
+                            }
+                        }
+                        updateCountdown();
+                        setInterval(updateCountdown, 1000);
+                        </script>
+                    {% endif %}
+                    {% else %}<span class="text-danger">Inactive</span>{% if is_owner %}
+                        <a href="{% url 'payfast_payment' colledge.id %}" class="btn btn-sm btn-warning ms-2">Activate / Renew</a>
+                    {% endif %}{% endif %}</p>
+
+                    <!-- Colledge Subjects Buttons -->
+                    <div class="mb-3">
+                        <a href="{% url 'colledge_subjects' colledge.id %}" class="btn btn-outline-primary btn-sm me-2">View Subjects</a>
+                        {% if is_owner %}
+                        <a href="{% url 'colledge_subjects' colledge.id %}#add-subject" class="btn btn-outline-success btn-sm">Add Subject</a>
+                        {% endif %}
+                    </div>
+                    <p><strong>Owner:</strong> {{ colledge.owner.username }}</p>
+                    <p><strong>Members:</strong> {{ members.count }} / {{ colledge.max_members }}</p>
+                    {% if is_owner and not colledge.is_active %}
+                        <a href="{% url 'delete_colledge_class' colledge.id %}" class="btn btn-danger btn-sm mb-2">Delete Class</a>
+                    {% endif %}
+                    {% if is_owner and can_add %}
+                        <hr>
+                        <h5>Add Member by Email</h5>
+                        <form method="post">
+                            {% csrf_token %}
+                            {{ add_form.as_p }}
+                            <button type="submit" name="add_member" class="btn btn-success">Add Member</button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header bg-info text-white">Members</div>
+                <div class="card-body">
+                    <ul class="list-group">
+                        {% for member in members %}
+                            <li class="list-group-item">{{ member.username }} ({{ member.email }})</li>
+                        {% empty %}
+                            <li class="list-group-item text-muted">No members yet.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

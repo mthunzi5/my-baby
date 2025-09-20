@@ -1,0 +1,423 @@
+{% extends "base.html" %}
+{% load post_extras %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <!-- Back to Feed Button -->
+            <div class="mb-3">
+                <a href="{% url 'post_feed' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Feed
+                </a>
+            </div>
+
+            <!-- Main Post Card -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header d-flex align-items-center">
+                    {% if post.author.profile.profile_picture %}
+                        <img src="{{ post.author.profile.profile_picture.url }}" 
+                             class="rounded-circle me-3" 
+                             style="width: 50px; height: 50px; object-fit: cover;">
+                    {% else %}
+                        <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center me-3" 
+                             style="width: 50px; height: 50px;">
+                            <i class="fas fa-user text-white fa-lg"></i>
+                        </div>
+                    {% endif %}
+                    <div class="flex-grow-1">
+                        <h6 class="mb-0">
+                            <a href="{% url 'user_profile' post.author.username %}" class="text-decoration-none">
+                                @{{ post.author.username }}
+                            </a>
+                        </h6>
+                        <small class="text-muted">{{ post.created_at|timesince }} ago</small>
+                    </div>
+                    {% if post.author == user %}
+                    <div class="dropdown">
+                        <button class="btn btn-link dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-ellipsis-h"></i>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'edit_post' post.id %}">
+                                <i class="fas fa-edit"></i> Edit Post
+                            </a></li>
+                            <li><a class="dropdown-item text-danger" href="{% url 'delete_post' post.id %}">
+                                <i class="fas fa-trash"></i> Delete Post
+                            </a></li>
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="card-body">
+                    <p class="card-text fs-5">{{ post.content }}</p>
+                    {% if post.image %}
+                        <img src="{{ post.image.url }}" class="img-fluid rounded mb-3" alt="Post image">
+                    {% endif %}
+                </div>
+
+                <div class="card-footer bg-transparent">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <!-- AJAX Like Button -->
+                            <button class="btn btn-link p-0 me-3 like-btn" 
+                                    data-post-id="{{ post.id }}"
+                                    data-liked="{% if post|has_liked:user %}true{% else %}false{% endif %}">
+                                <i class="fas fa-heart like-icon {% if post|has_liked:user %}text-danger{% else %}text-muted{% endif %} fa-lg"></i>
+                                <span class="like-count ms-1">{{ post.reactions.count }}</span>
+                            </button>
+
+                            <span class="text-muted">
+                                <i class="fas fa-comment"></i>
+                                <span class="ms-1">{{ comments.count }} comment{% if comments.count != 1 %}s{% endif %}</span>
+                            </span>
+                        </div>
+                        
+                        <small class="text-muted">{{ post.created_at|date:"M d, Y g:i A" }}</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Comment Form -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0">💬 Add a Comment</h6>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'add_comment' post.id %}" id="main-comment-form">
+                        {% csrf_token %}
+                        <div class="d-flex">
+                            {% if user.profile.profile_picture %}
+                                <img src="{{ user.profile.profile_picture.url }}" 
+                                     class="rounded-circle me-3" 
+                                     style="width: 40px; height: 40px; object-fit: cover;">
+                            {% else %}
+                                <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center me-3" 
+                                     style="width: 40px; height: 40px;">
+                                    <i class="fas fa-user text-white"></i>
+                                </div>
+                            {% endif %}
+                            <div class="flex-grow-1">
+                                <textarea name="text" class="form-control" rows="3" 
+                                          placeholder="What are your thoughts?" required></textarea>
+                                <div class="mt-2">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-paper-plane"></i> Post Comment
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Comments Section -->
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h6 class="mb-0">💬 Comments ({{ comments.count }})</h6>
+                </div>
+                <div class="card-body">
+                    {% for comment in comments %}
+                    <div class="comment-item border-bottom pb-3 mb-3" data-comment-id="{{ comment.id }}">
+                        <div class="d-flex align-items-start">
+                            {% if comment.user.profile.profile_picture %}
+                                <img src="{{ comment.user.profile.profile_picture.url }}" 
+                                     class="rounded-circle me-3" 
+                                     style="width: 40px; height: 40px; object-fit: cover;">
+                            {% else %}
+                                <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center me-3" 
+                                     style="width: 40px; height: 40px;">
+                                    <i class="fas fa-user text-white"></i>
+                                </div>
+                            {% endif %}
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <h6 class="mb-0">
+                                        <a href="{% url 'user_profile' comment.user.username %}" class="text-decoration-none">
+                                            @{{ comment.user.username }}
+                                        </a>
+                                    </h6>
+                                    <div class="d-flex align-items-center">
+                                        <small class="text-muted me-2">{{ comment.created_at|timesince }} ago</small>
+                                        {% if comment.user == user %}
+                                        <div class="dropdown">
+                                            <button class="btn btn-link btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                <i class="fas fa-ellipsis-h"></i>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end">
+                                                <li><a class="dropdown-item" href="{% url 'edit_comment' comment.id %}">
+                                                    <i class="fas fa-edit"></i> Edit
+                                                </a></li>
+                                                <li><a class="dropdown-item text-danger" href="{% url 'delete_comment' comment.id %}">
+                                                    <i class="fas fa-trash"></i> Delete
+                                                </a></li>
+                                            </ul>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <p class="mb-2">{{ comment.text }}</p>
+                                
+                                <!-- Comment Actions -->
+                                <div class="d-flex align-items-center">
+    <button class="btn btn-link btn-sm p-0 me-3 comment-like-btn" 
+            data-comment-id="{{ comment.id }}"
+            data-liked="{% if request.user in comment.reactions.all %}true{% else %}false{% endif %}">
+        <i class="fas fa-heart comment-like-icon {% if request.user in comment.reactions.all %}text-danger{% else %}text-muted{% endif %}"></i>
+        <span class="comment-like-count ms-1">{{ comment.reactions.count }}</span>
+    </button>
+    <button class="btn btn-link btn-sm p-0 reply-btn" 
+            data-comment-id="{{ comment.id }}">
+        <i class="fas fa-reply"></i> Reply
+    </button>
+</div>
+
+                                <!-- Reply Form (Hidden by default) -->
+                                <div class="reply-form mt-3" id="reply-form-{{ comment.id }}" style="display: none;">
+                                    <form method="post" action="{% url 'add_comment' post.id %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="parent" value="{{ comment.id }}">
+                                        <div class="d-flex">
+                                            {% if user.profile.profile_picture %}
+                                                <img src="{{ user.profile.profile_picture.url }}" 
+                                                     class="rounded-circle me-2" 
+                                                     style="width: 30px; height: 30px; object-fit: cover;">
+                                            {% else %}
+                                                <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center me-2" 
+                                                     style="width: 30px; height: 30px;">
+                                                    <i class="fas fa-user text-white"></i>
+                                                </div>
+                                            {% endif %}
+                                            <div class="flex-grow-1">
+                                                <textarea name="text" class="form-control form-control-sm" rows="2" 
+                                                          placeholder="Write a reply..." required></textarea>
+                                                <div class="mt-2">
+                                                    <button type="submit" class="btn btn-primary btn-sm">
+                                                        <i class="fas fa-paper-plane"></i> Reply
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-secondary btn-sm cancel-reply-btn">
+                                                        Cancel
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+
+                                <!-- Replies -->
+                                {% for reply in comment.replies.all %}
+                                <div class="reply-item mt-3 ms-4 p-3 bg-light rounded">
+                                    <div class="d-flex align-items-start">
+                                        {% if reply.user.profile.profile_picture %}
+                                            <img src="{{ reply.user.profile.profile_picture.url }}" 
+                                                 class="rounded-circle me-2" 
+                                                 style="width: 30px; height: 30px; object-fit: cover;">
+                                        {% else %}
+                                            <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center me-2" 
+                                                 style="width: 30px; height: 30px;">
+                                                <i class="fas fa-user text-white"></i>
+                                            </div>
+                                        {% endif %}
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <h6 class="mb-0">
+                                                    <a href="{% url 'user_profile' reply.user.username %}" class="text-decoration-none">
+                                                        @{{ reply.user.username }}
+                                                    </a>
+                                                </h6>
+                                                <div class="d-flex align-items-center">
+                                                    <small class="text-muted me-2">{{ reply.created_at|timesince }} ago</small>
+                                                    {% if reply.user == user %}
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-link btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                            <i class="fas fa-ellipsis-h"></i>
+                                                        </button>
+                                                        <ul class="dropdown-menu dropdown-menu-end">
+                                                            <li><a class="dropdown-item" href="{% url 'edit_comment' reply.id %}">
+                                                                <i class="fas fa-edit"></i> Edit
+                                                            </a></li>
+                                                            <li><a class="dropdown-item text-danger" href="{% url 'delete_comment' reply.id %}">
+                                                                <i class="fas fa-trash"></i> Delete
+                                                            </a></li>
+                                                        </ul>
+                                                    </div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            <p class="mb-0">{{ reply.text }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No comments yet</h5>
+                        <p class="text-muted">Be the first to share your thoughts!</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden CSRF token for AJAX -->
+{% csrf_token %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Get CSRF token
+    function getCSRFToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]').value;
+    }
+
+    // Handle post like button (existing code)
+    document.querySelectorAll('.like-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const postId = this.dataset.postId;
+            const likeIcon = this.querySelector('.like-icon');
+            const likeCount = this.querySelector('.like-count');
+
+            this.disabled = true;
+            const originalIcon = likeIcon.className;
+            likeIcon.className = 'fas fa-spinner fa-spin text-primary fa-lg';
+
+            fetch(`/social/react/${postId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': getCSRFToken(),
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: new URLSearchParams({'csrfmiddlewaretoken': getCSRFToken()})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    likeCount.textContent = data.like_count;
+                    if (data.liked) {
+                        likeIcon.className = 'fas fa-heart text-danger fa-lg';
+                        this.dataset.liked = 'true';
+                        this.classList.add('animate-heart');
+                        setTimeout(() => this.classList.remove('animate-heart'), 300);
+                    } else {
+                        likeIcon.className = 'fas fa-heart text-muted fa-lg';
+                        this.dataset.liked = 'false';
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                likeIcon.className = originalIcon;
+            })
+            .finally(() => {
+                this.disabled = false;
+            });
+        });
+    });
+
+    // Handle comment like buttons (NEW CODE)
+    document.querySelectorAll('.comment-like-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const commentId = this.dataset.commentId;
+            const likeIcon = this.querySelector('.comment-like-icon');
+            const likeCount = this.querySelector('.comment-like-count');
+
+            // Disable button during request
+            this.disabled = true;
+            const originalIcon = likeIcon.className;
+            likeIcon.className = 'fas fa-spinner fa-spin text-primary';
+
+            console.log('Attempting to like/unlike comment:', commentId);
+
+            fetch(`/comment/${commentId}/react/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': getCSRFToken(),
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: new URLSearchParams({'csrfmiddlewaretoken': getCSRFToken()})
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Response data:', data);
+                if (data.status === 'success') {
+                    likeCount.textContent = data.like_count;
+                    if (data.liked) {
+                        likeIcon.className = 'fas fa-heart text-danger';
+                        this.dataset.liked = 'true';
+                        // Add animation
+                        this.classList.add('animate-heart');
+                        setTimeout(() => this.classList.remove('animate-heart'), 300);
+                    } else {
+                        likeIcon.className = 'fas fa-heart text-muted';
+                        this.dataset.liked = 'false';
+                    }
+                } else {
+                    throw new Error(data.message || 'Unknown error occurred');
+                }
+            })
+            .catch(error => {
+                console.error('Comment like error:', error);
+                likeIcon.className = originalIcon;
+                
+                // Show error message
+                const toast = document.createElement('div');
+                toast.className = 'toast-error';
+                toast.textContent = 'Failed to update comment like. Please try again.';
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 3000);
+            })
+            .finally(() => {
+                this.disabled = false;
+            });
+        });
+    });
+
+    // Handle reply buttons (existing code)
+    document.querySelectorAll('.reply-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const commentId = this.dataset.commentId;
+            const replyForm = document.getElementById(`reply-form-${commentId}`);
+            
+            // Hide all other reply forms
+            document.querySelectorAll('.reply-form').forEach(form => {
+                if (form.id !== `reply-form-${commentId}`) {
+                    form.style.display = 'none';
+                }
+            });
+            
+            // Toggle current reply form
+            if (replyForm.style.display === 'none') {
+                replyForm.style.display = 'block';
+                replyForm.querySelector('textarea').focus();
+            } else {
+                replyForm.style.display = 'none';
+            }
+        });
+    });
+
+    // Handle cancel reply buttons (existing code)
+    document.querySelectorAll('.cancel-reply-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const replyForm = this.closest('.reply-form');
+            replyForm.style.display = 'none';
+            replyForm.querySelector('textarea').value = '';
+        });
+    });
+});
+</script>
+
+{% endblock %}

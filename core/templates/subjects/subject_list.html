@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Subjects{% endblock %}
+
+{% block content %}
+  <h2>Subjects</h2>
+  <p><a href="{% url 'subject_create' %}">+ Add Subject</a></p>
+  <table border="1" cellpadding="5">
+    <thead>
+      <tr>
+        <th>Cover</th>
+        <th>Name</th>
+        <th>Duration</th>
+        <th>Pass Mark</th>
+        <th>Lead Teacher</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for subject in subjects %}
+      <tr>
+        <td>
+          {% if subject.cover_image %}
+            <img src="{{ subject.cover_image.url }}" width="60" height="40" style="object-fit: cover;">
+          {% else %}
+            <span>No Image</span>
+          {% endif %}
+        </td>
+        <td>{{ subject.name }}</td>
+        <td>{{ subject.duration }}</td>
+        <td>{{ subject.pass_mark }}</td>
+        <td>{{ subject.lead_teacher }}</td>
+        <td>{{ subject.grade }}</td>
+        <td>
+          <a href="{% url 'subject_edit' subject.id %}">Edit</a> |
+          <a href="{% url 'subject_delete' subject.id %}" onclick="return confirm('Delete?')">Delete</a> |
+          <a href="{% url 'subject_manage_users' subject.id %}">Manage Users</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6">No subjects found.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

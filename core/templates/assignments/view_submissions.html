@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}Submissions - {{ assignment.title }}{% endblock %}
+{% block content %}
+<h2>📥 Submissions for "{{ assignment.title }}"</h2>
+
+<a href="{% url 'download_all_submissions' assignment.id %}" class="btn btn-primary">
+  ⬇️ Download All Submissions (ZIP)
+</a>
+<br><br>
+
+<table border="1" cellpadding="8">
+  <tr>
+    <th>Student</th>
+    <th>File</th>
+    <th>Submitted At</th>
+    <th>Grade</th>
+    <th>Actions</th>
+  </tr>
+  {% for sub in submissions %}
+    <tr>
+      <td>{{ sub.student.username }}</td>
+      <td>
+        {% if sub.submission_file %}
+          <a href="{{ sub.submission_file.url }}" target="_blank">📎 View File</a>
+        {% else %}
+          <span class="text-muted">No file</span>
+        {% endif %}
+      </td>
+      <td>{{ sub.submitted_at|date:"Y-m-d H:i" }}</td>
+      <td>{{ sub.grade|default:"Pending" }}</td>
+      <td>
+        <a href="{% url 'grade_submission' sub.id %}">Grade</a>
+      </td>
+    </tr>
+  {% empty %}
+    <tr>
+      <td colspan="5">No submissions yet.</td>
+    </tr>
+  {% endfor %}
+</table>
+{% endblock %} 

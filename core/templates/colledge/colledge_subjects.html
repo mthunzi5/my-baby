@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}Colledge Subjects{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Subjects for {{ colledge.name }}</h2>
+    {% if is_manager %}
+    <div class="card mb-4">
+        <div class="card-header">Add Subject</div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button class="btn btn-primary">Add Subject</button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+    <div class="card mb-4">
+        <div class="card-header">Subjects</div>
+        <ul class="list-group list-group-flush">
+            {% for subject in subjects %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>
+                    {{ subject.name }}
+                    <span class="text-muted">({{ subject.created_by.username }})</span>
+                </span>
+                <span class="btn-group">
+                    <a href="{% url 'colledge_subject_files' subject.id %}" class="btn btn-outline-secondary btn-sm">Files</a>
+                    <a href="{% url 'colledge_subject_tests' subject.id %}" class="btn btn-outline-info btn-sm">Tests</a>
+                    <a href="{% url 'colledge_subject_assignments' subject.id %}" class="btn btn-outline-success btn-sm">Assignments</a>
+                </span>
+            </li>
+            {% empty %}
+            <li class="list-group-item text-muted">No subjects yet.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- My History Section -->
+    <div class="card mb-4">
+        <div class="card-header">📜 My Test & Assignment History</div>
+        <div class="card-body">
+            <a href="{% url 'my_colledge_history' %}" class="btn btn-outline-primary w-100">
+                View My Test & Assignment History
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

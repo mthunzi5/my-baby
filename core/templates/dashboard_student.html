@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+            <h2 class="mb-1">👋 Welcome, {{ user.first_name|default:user.username }}!</h2>
+            <p class="lead">Your personalized student dashboard</p>
+        </div>
+    </div>
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">📚 My Subjects</h5>
+                    <p class="display-6">{{ user.subjects.count }}</p>
+                    <a href="{% url 'my_subjects' %}" class="btn btn-outline-primary btn-sm">View Subjects</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">📝 Assignments</h5>
+                    {% if user.subjects.first %}
+                        <a href="{% url 'student_assignment_list' user.subjects.first.id %}" class="btn btn-outline-success btn-sm">View Assignments</a>
+                    {% else %}
+                        <span class="text-muted">No subjects assigned</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">🧪 Tests</h5>
+                    {% if user.subjects.first %}
+                        <a href="{% url 'subject_tests' user.subjects.first.id %}" class="btn btn-outline-warning btn-sm">Take Test</a>
+                    {% else %}
+                        <span class="text-muted">No subjects assigned</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">📊 My Grades</h5>
+                    <a href="{% url 'student_analytics' %}" class="btn btn-outline-info btn-sm">View Analytics</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6 mb-3">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">Recent Assignments</div>
+                <div class="card-body">
+                    {% if recent_assignments %}
+                        <ul class="list-group list-group-flush">
+                        {% for a in recent_assignments %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>{{ a.title }} <small class="text-muted">(Due: {{ a.due_date|date:'M d, Y H:i' }})</small></span>
+                                <a href="{% url 'submit_assignment' a.id %}" class="btn btn-sm btn-outline-success">Submit</a>
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    {% else %}
+                        <span class="text-muted">No recent assignments.</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-3">
+            <div class="card h-100">
+                <div class="card-header bg-warning text-dark">Upcoming Tests</div>
+                <div class="card-body">
+                    {% if upcoming_tests %}
+                        <ul class="list-group list-group-flush">
+                        {% for t in upcoming_tests %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>{{ t.title }} <small class="text-muted">(Date: {{ t.date|date:'M d, Y' }})</small></span>
+                                <a href="{% url 'write_test' t.id %}" class="btn btn-sm btn-outline-warning">Take Test</a>
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    {% else %}
+                        <span class="text-muted">No upcoming tests.</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">📢 Announcements</div>
+                <div class="card-body">
+                    {% if announcements %}
+                        <ul class="list-group list-group-flush">
+                        {% for ann in announcements %}
+                            <li class="list-group-item">{{ ann.content }} <span class="text-muted float-end">{{ ann.created_at|date:'M d, Y H:i' }}</span></li>
+                        {% endfor %}
+                        </ul>
+                    {% else %}
+                        <span class="text-muted">No announcements at this time.</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

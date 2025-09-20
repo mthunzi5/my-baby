@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Assignments - {{ subject.name }}{% endblock %}
+
+{% block content %}
+<h2>📘 Assignments for {{ subject.name }}</h2>
+
+<a href="{% url 'create_assignment' subject.id %}">+ Create New Assignment</a>
+<hr>
+
+{% if assignments %}
+  <ul>
+    {% for assignment in assignments %}
+      <li>
+        <strong>{{ assignment.title }}</strong> (Due: {{ assignment.due_date|date:"Y-m-d H:i" }})
+        <br>
+        <a href="{% url 'edit_assignment' assignment.id %}">✏️ Edit</a> |
+        <a href="{% url 'delete_assignment' assignment.id %}" onclick="return confirm('Are you sure?')">🗑️ Delete</a> |
+        <a href="{% url 'view_assignment_submissions' assignment.id %}">📥 View Submissions</a>
+        <br><small>{{ assignment.description|truncatewords:25 }}</small>
+      </li>
+      <hr>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>No assignments posted yet.</p>
+{% endif %}
+{% endblock %}

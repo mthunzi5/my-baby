@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}My Drafting Sessions{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>📂 My Drafting Sessions</h2>
+
+  <a href="{% url 'create_draft' %}" class="btn btn-success mb-3">➕ New Draft</a>
+
+  {% if drafts %}
+    <ul class="list-group">
+      {% for draft in drafts %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <div>
+            <strong>{{ draft.title }}</strong><br>
+            <small class="text-muted">Created: {{ draft.created_at|date:"Y-m-d H:i" }}</small>
+          </div>
+          <div>
+            <a href="{% url 'draft_workspace' draft.pk %}" class="btn btn-sm btn-primary">✏️ Continue</a>
+            <a href="{% url 'delete_draft' draft.pk %}" class="btn btn-sm btn-danger" onclick="return confirm('Delete this draft?')">🗑 Delete</a>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No drafts found. Start by creating one.</p>
+  {% endif %}
+</div>
+{% endblock %}

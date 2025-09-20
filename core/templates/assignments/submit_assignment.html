@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4>Submit Assignment: {{ assignment.title }}</h4>
+                </div>
+                <div class="card-body">
+                    <p><strong>Due Date:</strong> {{ assignment.due_date }}</p>
+                    {% if assignment.instruction_file %}
+                        <p><strong>Instructions:</strong> <a href="{{ assignment.instruction_file.url }}" target="_blank">Download</a></p>
+                    {% endif %}
+
+                    {% if not assignment_closed %}
+                        <div id="countdown" class="mb-3 alert alert-info" style="font-weight:bold;"></div>
+                        <script>
+                        // Countdown timer
+                        var timeLeft = Number("{{ time_left|default:0 }}");
+                        function formatTime(secs) {
+                            var d = Math.floor(secs / (3600*24));
+                            var h = Math.floor((secs % (3600*24)) / 3600);
+                            var m = Math.floor((secs % 3600) / 60);
+                            var s = secs % 60;
+                            return `${d}d ${h}h ${m}m ${s}s`;
+                        }
+                        function updateCountdown() {
+                            var el = document.getElementById('countdown');
+                            if (timeLeft > 0) {
+                                el.textContent = 'Time left: ' + formatTime(timeLeft);
+                                timeLeft--;
+                            } else {
+                                el.textContent = 'Assignment deadline reached!';
+                                var btn = document.querySelector('button[type="submit"]');
+                                if (btn) btn.disabled = true;
+                            }
+                        }
+                        updateCountdown();
+                        setInterval(updateCountdown, 1000);
+                        </script>
+                    {% endif %}
+
+                    {% if submission %}
+                        <div class="alert alert-info">You have already submitted this assignment.</div>
+                        <p><strong>Submitted File:</strong> <a href="{{ submission.file.url }}" target="_blank">Download</a></p>
+                        <p><strong>Comment:</strong> {{ submission.comment }}</p>
+                        {% if can_edit %}
+                            <a href="{% url 'edit_assignment_submission' submission.id %}" class="btn btn-warning btn-sm">Edit Submission</a>
+                            <a href="{% url 'delete_assignment_submission' submission.id %}" class="btn btn-danger btn-sm">Delete Submission</a>
+                        {% endif %}
+                    {% elif assignment_closed %}
+                        <div class="alert alert-danger">Assignment closed. You cannot submit after the deadline.</div>
+                    {% else %}
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                            <button type="submit" class="btn btn-success">Submit</button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

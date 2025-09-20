@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Assignment Submissions: {{ assignment.title }}{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Assignment Submissions: {{ assignment.title }} ({{ colledge.name }})</h2>
+    <div class="card">
+        <div class="card-header">Submissions</div>
+        <ul class="list-group list-group-flush">
+            {% for sub in submissions %}
+            <li class="list-group-item">
+                <strong>{{ sub.user.username }}</strong> - {{ sub.submitted_at|date:'Y-m-d H:i' }}
+                <a href="{{ sub.file.url }}" target="_blank" class="btn btn-sm btn-outline-secondary ms-2">Download</a>
+                {% if sub.graded %}
+                    <span class="badge bg-success">Graded: {{ sub.grade }}</span>
+                    {% if sub.feedback %}<br><small>Feedback: {{ sub.feedback }}</small>{% endif %}
+                {% else %}
+                    <form method="post" class="d-inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="sub_id" value="{{ sub.id }}">
+                        {{ grade_form.grade }}
+                        {{ grade_form.feedback }}
+                        <button class="btn btn-sm btn-primary">Grade</button>
+                    </form>
+                {% endif %}
+            </li>
+            {% empty %}
+            <li class="list-group-item text-muted">No submissions yet.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

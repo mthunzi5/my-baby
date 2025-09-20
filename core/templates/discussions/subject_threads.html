@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>💬 {{ subject.name }} Discussions</h2>
+<a href="{% url 'create_thread' subject.id %}">+ New Thread</a>
+<ul>
+  {% for thread in threads %}
+    <li><a href="{% url 'view_thread' thread.id %}">{{ thread.title }}</a> by {{ thread.created_by.username }}</li>
+  {% endfor %}
+</ul>
+{% endblock %}

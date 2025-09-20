@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Test Submissions: {{ test.name }}{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Test Submissions: {{ test.name }} ({{ colledge.name }})</h2>
+    <div class="card">
+        <div class="card-header">Submissions</div>
+        <ul class="list-group list-group-flush">
+            {% for sub in submissions %}
+            <li class="list-group-item">
+                <strong>{{ sub.user.username }}</strong> - {{ sub.submitted_at|date:'Y-m-d H:i' }}
+                {% if sub.graded %}
+                    <span class="badge bg-success">Graded: {{ sub.score }}</span>
+                {% else %}
+                    <form method="post" class="d-inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="sub_id" value="{{ sub.id }}">
+                        {{ grade_form.score }}
+                        <button class="btn btn-sm btn-primary">Grade</button>
+                    </form>
+                {% endif %}
+            </li>
+            {% empty %}
+            <li class="list-group-item text-muted">No submissions yet.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

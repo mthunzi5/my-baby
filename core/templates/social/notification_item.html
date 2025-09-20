@@ -1,0 +1,187 @@
+<div class="notification-item border-bottom p-3 hover-bg">
+    {% if item.type == 'grouped' %}
+        <!-- Grouped Notifications -->
+        <div class="d-flex align-items-start">
+            <div class="notification-avatars me-3">
+                {% for actor in item.actors %}
+                    {% if actor.profile.profile_picture %}
+                        <img src="{{ actor.profile.profile_picture.url }}" 
+                             class="avatar-sm" 
+                             alt="{{ actor.username }}"
+                             title="{{ actor.username }}">
+                    {% else %}
+                        <div class="avatar-sm bg-secondary text-white d-flex align-items-center justify-content-center">
+                            {{ actor.username|first|upper }}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            
+            <div class="flex-grow-1">
+                <div class="notification-content">
+                    <strong>
+                        {% if item.count == 2 %}
+                            {{ item.actors.0.username }} and {{ item.actors.1.username }}
+                        {% elif item.count == 3 %}
+                            {{ item.actors.0.username }}, {{ item.actors.1.username }} and {{ item.actors.2.username }}
+                        {% else %}
+                            {{ item.actors.0.username }}
+                            {% if item.count > 1 %}
+                                and {{ item.count|add:"-1" }} other{% if item.count > 2 %}s{% endif %}
+                            {% endif %}
+                        {% endif %}
+                    </strong>
+                    
+                    {% if item.verb == "liked your post" %}
+                        <i class="fas fa-heart text-danger"></i> liked your post
+                    {% elif item.verb == "commented" %}
+                        <i class="fas fa-comment text-primary"></i> commented on your post
+                    {% else %}
+                        {{ item.verb }}
+                    {% endif %}
+                </div>
+                
+                {% if item.post %}
+                <div class="post-preview mt-2">
+                    <a href="{% url 'post_detail' item.post.id %}" class="text-decoration-none">
+                        <div class="bg-light p-2 rounded">
+                            <small class="text-muted">
+                                "{{ item.post.content|truncatechars:60 }}"
+                            </small>
+                        </div>
+                    </a>
+                </div>
+                {% endif %}
+                
+                <small class="text-muted">{{ item.latest_time|timesince }} ago</small>
+            </div>
+        </div>
+
+    {% elif item.type == 'single' %}
+        <!-- Single Notification -->
+        <div class="d-flex align-items-start">
+            <div class="me-3">
+                {% if item.notification.actor.profile.profile_picture %}
+                    <img src="{{ item.notification.actor.profile.profile_picture.url }}" 
+                         class="avatar-md" 
+                         alt="{{ item.notification.actor.username }}">
+                {% else %}
+                    <div class="avatar-md bg-secondary text-white d-flex align-items-center justify-content-center">
+                        {{ item.notification.actor.username|first|upper }}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="flex-grow-1">
+                <div class="notification-content">
+                    <strong>{{ item.notification.actor.username }}</strong>
+                    
+                    {% if item.notification.verb == "liked your post" %}
+                        <i class="fas fa-heart text-danger"></i> liked your post
+                    {% elif item.notification.verb == "commented" %}
+                        <i class="fas fa-comment text-primary"></i> commented on your post
+                    {% else %}
+                        {{ item.notification.verb }}
+                    {% endif %}
+                </div>
+                
+                {% if item.notification.post %}
+                <div class="post-preview mt-2">
+                    <a href="{% url 'post_detail' item.notification.post.id %}" class="text-decoration-none">
+                        <div class="bg-light p-2 rounded">
+                            <small class="text-muted">
+                                "{{ item.notification.post.content|truncatechars:60 }}"
+                            </small>
+                        </div>
+                    </a>
+                </div>
+                {% endif %}
+                
+                <small class="text-muted">{{ item.notification.created_at|timesince }} ago</small>
+            </div>
+        </div>
+
+    {% else %}
+        <!-- Standalone Notification (like follows) -->
+        <div class="d-flex align-items-start">
+            <div class="me-3">
+                {% if item.notification.actor.profile.profile_picture %}
+                    <img src="{{ item.notification.actor.profile.profile_picture.url }}" 
+                         class="avatar-md" 
+                         alt="{{ item.notification.actor.username }}">
+                {% else %}
+                    <div class="avatar-md bg-secondary text-white d-flex align-items-center justify-content-center">
+                        {{ item.notification.actor.username|first|upper }}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="flex-grow-1">
+                <div class="notification-content">
+                    <strong>{{ item.notification.actor.username }}</strong>
+                    
+                    {% if item.notification.verb == "followed you" %}
+                        <i class="fas fa-user-plus text-success"></i> started following you
+                    {% else %}
+                        {{ item.notification.verb }}
+                    {% endif %}
+                </div>
+                
+                <small class="text-muted">{{ item.notification.created_at|timesince }} ago</small>
+            </div>
+            
+            <div class="ms-2">
+                <a href="{% url 'user_profile' item.notification.actor.username %}" class="btn btn-sm btn-outline-primary">
+                    View Profile
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+.notification-item {
+    transition: background-color 0.2s ease;
+}
+
+.notification-item:hover {
+    background-color: #f8f9fa;
+}
+
+.avatar-sm {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    margin-right: -8px;
+    border: 2px solid white;
+    object-fit: cover;
+}
+
+.avatar-md {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.notification-avatars {
+    display: flex;
+    align-items: center;
+}
+
+.post-preview {
+    max-width: 300px;
+}
+
+.hover-bg:hover {
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+.card-header h6 {
+    font-weight: 600;
+}
+
+.notification-content {
+    line-height: 1.4;
+}
+</style>

@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>📜 My Colledge History</h2>
+    <hr>
+    <h4>📝 Assignment History</h4>
+    {% if assignment_submissions %}
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Assignment</th>
+                        <th>Submitted At</th>
+                        <th>Status</th>
+                        <th>Grade</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for sub in assignment_submissions %}
+                    <tr>
+                        <td>{{ sub.assignment.title|default:"(No Title)" }}</td>
+                        <td>{{ sub.submitted_at|date:"M d, Y H:i" }}</td>
+                        <td>
+                            {% if sub.graded %}
+                                <span class="badge bg-success">Graded</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">Not Graded</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if sub.graded %}
+                                {{ sub.grade }}
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="text-muted">No assignment submissions found.</p>
+    {% endif %}
+
+    <h4 class="mt-4">🧪 Test History</h4>
+    {% if test_submissions %}
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Test</th>
+                        <th>Submitted At</th>
+                        <th>Status</th>
+                        <th>Grade</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for sub in test_submissions %}
+                    <tr>
+                        <td>{{ sub.test.title|default:"(No Title)" }}</td>
+                        <td>{{ sub.submitted_at|date:"M d, Y H:i" }}</td>
+                        <td>
+                            {% if sub.graded %}
+                                <span class="badge bg-success">Graded</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">Not Graded</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if sub.graded %}
+                                {{ sub.grade }}
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="text-muted">No test submissions found.</p>
+    {% endif %}
+</div>
+{% endblock %}

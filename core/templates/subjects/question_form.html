@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}Add Question{% endblock %}
+{% block content %}
+<h2>{{ form.instance.id|yesno:"Edit Question,Add Question" }}</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save Question</button>
+</form>
+{% endblock %}
+<!-- This template allows users to add or edit a question related to a test. -->
+<!-- The form is dynamically generated based on the instance of the question being edited or created. -->

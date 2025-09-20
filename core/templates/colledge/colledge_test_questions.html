@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Questions for {{ test.name }}{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Questions for {{ test.name }} ({{ colledge.name }})</h2>
+    <div class="card mb-4">
+        <div class="card-header">Add Question</div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button class="btn btn-primary">Add Question</button>
+            </form>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">Questions</div>
+        <ul class="list-group list-group-flush">
+            {% for q in questions %}
+            <li class="list-group-item">{{ q.question_text }}</li>
+            {% empty %}
+            <li class="list-group-item text-muted">No questions yet.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

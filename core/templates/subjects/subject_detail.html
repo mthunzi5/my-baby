@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ subject.name }}{% endblock %}
+
+{% block content %}
+<h2>{{ subject.name }}</h2>
+<p>{{ subject.description }}</p>
+
+{% if user.role == 'teacher' %}
+  <div>
+    <strong>🔧 Teacher Tools:</strong><br>
+    <a href="{% url 'upload_subject_file' subject.id %}">📤 Upload File</a> |
+    <a href="{% url 'create_test' subject.id %}">🧪 Create Test</a> |
+    <a href="{% url 'subject_tests' subject.id %}">🛠️ Manage Tests</a> |
+    <a href="{% url 'subject_threads' subject.id %}">💬 View Discussions</a> |
+    <a href="{% url 'teacher_assignment_list' subject.id %}">📘 View Assignments</a> |
+    <a href="{% url 'create_assignment' subject.id %}">➕ Create Assignment</a>
+  </div>
+{% elif user.role == 'student' %}
+  <div>
+    <strong>📚 Student Options:</strong><br>
+    <a href="{% url 'subject_tests' subject.id %}">🧪 View Tests</a> |
+    <a href="{% url 'subject_threads' subject.id %}">💬 View Discussions</a> |
+    <a href="{% url 'student_assignment_list' subject.id %}">📘 View Assignments</a>
+  </div>
+{% endif %}
+
+<hr>
+
+<h3>📂 Files</h3>
+<ul>
+  {% for file in files %}
+    <li>
+      <a href="{{ file.file.url }}" target="_blank">{{ file.title }}</a>
+      ({{ file.uploaded_by.username }}, {{ file.uploaded_at|date:"Y-m-d H:i" }})
+      {% if user == file.uploaded_by or user.role == 'school_admin' %}
+        | <a href="{% url 'delete_subject_file' subject.id file.id %}">🗑️ Delete</a>
+      {% endif %}
+    </li>
+  {% empty %}
+    <li>No files uploaded for this subject.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

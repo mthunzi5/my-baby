@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}Add School User{% endblock %}
+
+{% block content %}
+<h2>Add Teacher or Student</h2>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+
+    <p>
+        <label for="id_role">Role:</label>
+        {{ form.role }}
+    </p>
+
+    <p>
+        <label for="id_username">Username:</label>
+        {{ form.username }}
+    </p>
+
+    <p>
+        <label for="id_email">Email:</label>
+        {{ form.email }}
+    </p>
+
+    <p>
+        <label for="id_password">Password:</label>
+        {{ form.password }}
+    </p>
+
+    <div id="student-fields" style="display: none;">
+        <p>
+            <label for="id_grade">Grade (Gr8–Gr12):</label>
+            {{ form.grade }}
+        </p>
+    </div>
+
+    <p>
+        <label for="id_profile_picture">Profile Picture:</label>
+        {{ form.profile_picture }}
+    </p>
+
+    <button type="submit">Save User</button>
+</form>
+
+<script>
+    // Show/hide grade if "Student" is selected
+    const roleField = document.getElementById("id_role");
+    const studentFields = document.getElementById("student-fields");
+
+    function toggleStudentFields() {
+        if (roleField.value === "student") {
+            studentFields.style.display = "block";
+        } else {
+            studentFields.style.display = "none";
+        }
+    }
+
+    roleField.addEventListener("change", toggleStudentFields);
+    window.onload = toggleStudentFields;
+</script>
+{% endblock %}

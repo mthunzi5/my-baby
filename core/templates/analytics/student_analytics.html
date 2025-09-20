@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% block title %}Student Analytics{% endblock %}
+
+{% block content %}
+<h2>📊 My Test Analytics</h2>
+
+<canvas id="analyticsChart" width="800" height="400" style="max-width: 100%;"></canvas>
+
+{{ chart_data|json_script:"chart-data" }}
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const chartData = JSON.parse(document.getElementById('chart-data').textContent || '{}');
+  const subjects = Object.keys(chartData);
+
+  const allWeeks = new Set();
+  subjects.forEach(subject => {
+    Object.keys(chartData[subject]).forEach(week => allWeeks.add(week));
+  });
+  const labels = Array.from(allWeeks).sort();
+
+  const colorPalette = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'];
+
+  const datasets = subjects.map((subject, index) => {
+    const data = labels.map(week => chartData[subject][week] || null);
+    return {
+      label: subject,
+      data: data,
+      backgroundColor: colorPalette[index % colorPalette.length],
+    };
+  });
+
+  new Chart(document.getElementById("analyticsChart"), {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: datasets
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: 'Weekly Average Grades by Subject'
+        },
+        tooltip: {
+          mode: 'index',
+          intersect: false,
+        },
+        legend: {
+          position: 'top'
+        }
+      },
+      interaction: {
+        mode: 'nearest',
+        axis: 'x',
+        intersect: false
+      },
+      scales: {
+        x: {
+          stacked: false,
+          title: {
+            display: true,
+            text: 'Week'
+          }
+        },
+        y: {
+          beginAtZero: true,
+          max: 100,
+          title: {
+            display: true,
+            text: 'Grade (%)'
+          }
+        }
+      }
+    }
+  });
+</script>
+{% endblock %}

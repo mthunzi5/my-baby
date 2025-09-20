@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Take Test: {{ test.name }}{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Take Test: {{ test.name }} ({{ colledge.name }})</h2>
+    <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="mb-3">
+                <label class="form-label">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}<div class="text-danger">{{ field.errors }}</div>{% endif %}
+            </div>
+        {% endfor %}
+        <button class="btn btn-success">Submit Test</button>
+    </form>
+</div>
+{% endblock %}

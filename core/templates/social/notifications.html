@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Notifications{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>🔔 Notifications</h2>
+                {% if unread_count > 0 %}
+                    <span class="badge bg-danger rounded-pill">{{ unread_count }} new</span>
+                {% endif %}
+            </div>
+
+            {% if has_notifications %}
+                <!-- Today's Notifications -->
+                {% if notifications_by_time.today %}
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h6 class="mb-0">📅 Today</h6>
+                    </div>
+                    <div class="card-body p-0">
+                        {% for item in notifications_by_time.today %}
+                            {% include 'social/notification_item.html' with item=item %}
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Yesterday's Notifications -->
+                {% if notifications_by_time.yesterday %}
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-header bg-secondary text-white">
+                        <h6 class="mb-0">📅 Yesterday</h6>
+                    </div>
+                    <div class="card-body p-0">
+                        {% for item in notifications_by_time.yesterday %}
+                            {% include 'social/notification_item.html' with item=item %}
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Earlier Notifications -->
+                {% if notifications_by_time.earlier %}
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-header bg-light text-dark">
+                        <h6 class="mb-0">📅 Earlier</h6>
+                    </div>
+                    <div class="card-body p-0">
+                        {% for item in notifications_by_time.earlier %}
+                            {% include 'social/notification_item.html' with item=item %}
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+            {% else %}
+                <!-- Empty State -->
+                <div class="text-center py-5">
+                    <div class="mb-4">
+                        <i class="fas fa-bell-slash fa-5x text-muted"></i>
+                    </div>
+                    <h4 class="text-muted">No notifications yet</h4>
+                    <p class="text-muted">When someone interacts with your posts, you'll see it here.</p>
+                    <a href="{% url 'post_feed' %}" class="btn btn-primary">
+                        <i class="fas fa-rss"></i> Go to Feed
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

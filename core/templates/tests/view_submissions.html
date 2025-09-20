@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Submissions for {{ test.title }}{% endblock %}
+{% block content %}
+<h2>Student Submissions: {{ test.title }}</h2>
+
+{% if test.is_auto_graded %}
+  <form method="post" action="{% url 'grade_all_auto' test.id %}">
+    {% csrf_token %}
+    <button type="submit">Grade All Automatically</button>
+  </form>
+{% endif %}
+
+<ul>
+  {% for submission in test.submissions.all %}
+    <li>
+      {{ submission.student.username }} -
+      {% if submission.is_graded %}
+        Grade: {{ submission.grade }}%
+      {% else %}
+        {% if not test.is_auto_graded %}
+          <a href="{% url 'manual_grade' submission.id %}">Grade Manually</a>
+        {% else %}
+          Not graded
+        {% endif %}
+      {% endif %}   
+    </li> 
+  {% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8 col-sm-12">
+      <div class="card border-0 shadow-lg rounded-4">
+        <div class="card-header bg-primary text-white rounded-top-4 text-center py-4">
+          <h3 class="mb-0"><i class="fas fa-user-plus me-2"></i>Add School Admin</h3>
+        </div>
+        <div class="card-body p-4">
+          <form method="post" autocomplete="off">
+            {% csrf_token %}
+            <div class="mb-3">
+              {{ form.non_field_errors }}
+            </div>
+            {% for field in form %}
+              <div class="mb-3">
+                {{ field.label_tag }}
+                {{ field }}
+                {% if field.help_text %}
+                  <small class="form-text text-muted">{{ field.help_text }}</small>
+                {% endif %}
+                {% for error in field.errors %}
+                  <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+              </div>
+            {% endfor %}
+            <div class="d-grid gap-2 mt-4">
+              <button type="submit" class="btn btn-primary btn-lg"><i class="fas fa-plus-circle me-1"></i> Create Admin</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

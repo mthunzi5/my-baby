@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}PayFast Payment{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h4>Activate Colledge Class: {{ colledge.name }}</h4>
+                </div>
+                <div class="card-body">
+                    <p><strong>Plan:</strong> {{ colledge.max_members }} members</p>
+                    <p><strong>Amount:</strong> R{{ payfast_data.amount }} per month</p>
+                    <form action="{{ payfast_url }}" method="post">
+                        {% for key, value in payfast_data.items %}
+                            <input type="hidden" name="{{ key }}" value="{{ value }}" />
+                        {% endfor %}
+                        <button type="submit" class="btn btn-success">Pay with PayFast</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

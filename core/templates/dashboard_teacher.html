@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}Teacher Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="mb-3">👨‍🏫 Welcome, {{ user.first_name|default:user.username }}!</h2>
+        </div>
+    </div>
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-book fa-2x mb-2 text-primary"></i>
+                    <h4>{{ my_subjects|length }}</h4>
+                    <p class="mb-0">My Subjects</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-user-graduate fa-2x mb-2 text-success"></i>
+                    <h4>{{ total_students }}</h4>
+                    <p class="mb-0">Total Students</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-tasks fa-2x mb-2 text-info"></i>
+                    <h4>{{ total_assignments }}</h4>
+                    <p class="mb-0">Assignments Created</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <h5 class="mb-3">📚 My Subjects</h5>
+            <div class="list-group">
+                {% for subject in my_subjects %}
+                    <a href="{% url 'subject_detail' subject.id %}" class="list-group-item list-group-item-action">
+                        <strong>{{ subject.name }}</strong> <span class="text-muted">({{ subject.grade }})</span>
+                        <span class="badge bg-secondary float-end">{{ subject.students.count }} students</span>
+                    </a>
+                {% empty %}
+                    <div class="text-muted">You are not assigned to any subjects yet.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <h5 class="mb-3">⚡ Quick Links</h5>
+            <div class="d-flex flex-wrap gap-3">
+                <a href="{% url 'my_subjects' %}" class="btn btn-outline-primary"><i class="fas fa-book"></i> My Subjects</a>
+                <a href="{% url 'my_subject_files' %}" class="btn btn-outline-info"><i class="fas fa-file-upload"></i> My Files</a>
+                {% if my_subjects and my_subjects.0.id %}
+                    <a href="{% url 'create_assignment' my_subjects.0.id %}" class="btn btn-outline-success"><i class="fas fa-plus"></i> Create Assignment</a>
+                {% else %}
+                    <a class="btn btn-outline-success disabled" tabindex="-1" aria-disabled="true"><i class="fas fa-plus"></i> Create Assignment</a>
+                {% endif %}
+                <a href="{% url 'my_tests' %}" class="btn btn-outline-warning"><i class="fas fa-clipboard-list"></i> My Tests</a>
+                <a href="{% url 'teacher_analytics' %}" class="btn btn-outline-secondary"><i class="fas fa-chart-bar"></i> Analytics</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

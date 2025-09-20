@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}Upload File{% endblock %}
+{% block content %}
+<h2>Upload File for {{ subject.name }}</h2>
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Upload</button>
+</form>
+<a href="{% url 'subject_detail' subject.id %}">← Back to Subject</a>
+{% endblock %}

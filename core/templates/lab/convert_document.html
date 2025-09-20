@@ -1,0 +1,22 @@
+<!-- core/templates/lab/convert_document.html -->
+{% extends "base.html" %}
+{% block title %}Convert Document{% endblock %}
+{% block content %}
+  <h2>Convert Document</h2>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Convert</button>
+  </form>
+
+  {% if converted_file_url %}
+    <h3>Download Converted File:</h3>
+    <a href="{{ converted_file_url }}" class="btn btn-success" download>Download</a>
+  {% endif %}
+
+  {% if ocr_text %}
+    <h3>Extracted Text:</h3>
+    <pre style="background:#f8f8f8; padding:10px;">{{ ocr_text }}</pre>
+    <a href="data:text/plain;charset=utf-8,{{ ocr_text|urlencode }}" download="ocr_result.txt" class="btn btn-success">Download Text</a>
+  {% endif %}
+{% endblock %}

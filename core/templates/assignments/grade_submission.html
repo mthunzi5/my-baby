@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Grade Submission{% endblock %}
+{% block content %}
+<h2>🧮 Grade Submission</h2>
+
+<p><strong>Student:</strong> {{ submission.student.username }}</p>
+<p><a href="{{ submission.submission_file.url }}" target="_blank">📎 View Submission</a></p>
+
+<form method="post">
+  {% csrf_token %}
+  <label for="grade">Grade (%):</label>
+  <input type="number" name="grade" min="0" max="100" required>
+  <br><br>
+  <button type="submit">Submit Grade</button>
+</form>
+{% endblock %}

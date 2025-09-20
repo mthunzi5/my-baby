@@ -1,0 +1,343 @@
+{% extends "base.html" %}
+{% load post_extras %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>🌐 Global Feed</h2>
+                <a href="{% url 'create_post' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Create Post
+                </a>
+            </div>
+
+            {% for post in posts %}
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header d-flex align-items-center">
+                    {% if post.author.profile.profile_picture %}
+                        <img src="{{ post.author.profile.profile_picture.url }}" 
+                             class="rounded-circle me-3" 
+                             style="width: 40px; height: 40px; object-fit: cover;">
+                    {% else %}
+                        <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center me-3" 
+                             style="width: 40px; height: 40px;">
+                            <i class="fas fa-user text-white"></i>
+                        </div>
+                    {% endif %}
+                    <div class="flex-grow-1">
+                        <h6 class="mb-0">
+                            <a href="{% url 'user_profile' post.author.username %}" class="text-decoration-none">
+                                @{{ post.author.username }}
+                            </a>
+                        </h6>
+                        <small class="text-muted">{{ post.created_at|timesince }} ago</small>
+                    </div>
+                    {% if post.author == user %}
+                    <div class="dropdown">
+                        <button class="btn btn-link dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-ellipsis-h"></i>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'edit_post' post.id %}">
+                                <i class="fas fa-edit"></i> Edit
+                            </a></li>
+                            <li><a class="dropdown-item text-danger" href="{% url 'delete_post' post.id %}">
+                                <i class="fas fa-trash"></i> Delete
+                            </a></li>
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="card-body">
+                    <p class="card-text">{{ post.content }}</p>
+                    {% if post.image %}
+                        <img src="{{ post.image.url }}" class="img-fluid rounded mb-3" alt="Post image">
+                    {% endif %}
+                </div>
+
+                <div class="card-footer bg-transparent">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <!-- AJAX Like Button -->
+                            <button class="btn btn-link p-0 me-3 like-btn" 
+                                    data-post-id="{{ post.id }}"
+                                    data-liked="{% if post|has_liked:user %}true{% else %}false{% endif %}">
+                                <i class="fas fa-heart like-icon {% if post|has_liked:user %}text-danger{% else %}text-muted{% endif %}"></i>
+                                <span class="like-count ms-1">{{ post.reactions.count }}</span>
+                            </button>
+
+                            <a href="{% url 'post_detail' post.id %}" class="btn btn-link p-0 text-muted me-3">
+                                <i class="fas fa-comment"></i>
+                                <span class="ms-1">{{ post.comments.count }}</span>
+                            </a>
+                        </div>
+                        
+                        <small class="text-muted">{{ post.created_at|date:"M d, Y" }}</small>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="text-center py-5">
+                <i class="fas fa-rss fa-3x text-muted mb-3"></i>
+                <h4>No posts yet</h4>
+                <p class="text-muted">Be the first to share something!</p>
+                <a href="{% url 'create_post' %}" class="btn btn-primary">Create Post</a>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Sidebar with suggestions -->
+        <div class="col-md-4">
+            {% if suggestions %}
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h6 class="mb-0">👥 Suggestions to Follow</h6>
+                </div>
+                <div class="card-body">
+                    {% for suggested_user in suggestions %}
+                    <div class="d-flex align-items-center mb-3">
+                        {% if suggested_user.profile.profile_picture %}
+                            <img src="{{ suggested_user.profile.profile_picture.url }}" 
+                                 class="rounded-circle me-3" 
+                                 style="width: 35px; height: 35px; object-fit: cover;">
+                        {% else %}
+                            <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center me-3" 
+                                 style="width: 35px; height: 35px;">
+                                <i class="fas fa-user text-white"></i>
+                            </div>
+                        {% endif %}
+                        <div class="flex-grow-1">
+                            <h6 class="mb-0">
+                                <a href="{% url 'user_profile' suggested_user.username %}" class="text-decoration-none">
+                                    @{{ suggested_user.username }}
+                                </a>
+                            </h6>
+                            {% if suggested_user.first_name or suggested_user.last_name %}
+                                <small class="text-muted">{{ suggested_user.first_name }} {{ suggested_user.last_name }}</small>
+                            {% else %}
+                                <small class="text-muted">{{ suggested_user.role|capfirst }}</small>
+                            {% endif %}
+                        </div>
+                        <form action="{% url 'toggle_follow' suggested_user.username %}" method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary btn-sm">
+                                <i class="fas fa-user-plus"></i> Follow
+                            </button>
+                        </form>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted">No suggestions available</p>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Quick Stats Card -->
+            <div class="card shadow-sm mt-3">
+                <div class="card-header">
+                    <h6 class="mb-0">📊 Quick Stats</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Total Posts:</span>
+                        <span class="badge bg-primary">{{ posts|length }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Following:</span>
+                        <span class="badge bg-success">{{ user.following.count }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Followers:</span>
+                        <span class="badge bg-info">{{ user.followers.count }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden CSRF token for AJAX -->
+{% csrf_token %}
+
+<!-- AJAX Script for Like Functionality -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Get CSRF token
+    function getCSRFToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]').value;
+    }
+
+    // Handle like button clicks
+    document.querySelectorAll('.like-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const postId = this.dataset.postId;
+            const likeIcon = this.querySelector('.like-icon');
+            const likeCount = this.querySelector('.like-count');
+
+            // Disable button during request
+            this.disabled = true;
+            
+            // Add loading state
+            const originalIcon = likeIcon.className;
+            likeIcon.className = 'fas fa-spinner fa-spin text-primary';
+
+            // Log for debugging
+            console.log('Attempting to like/unlike post:', postId);
+            console.log('URL:', `/social/react/${postId}/`);
+
+            fetch(`/social/react/${postId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': getCSRFToken(),
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: new URLSearchParams({
+                    'csrfmiddlewaretoken': getCSRFToken()
+                })
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Response data:', data);
+                
+                if (data.status === 'success') {
+                    // Update like count
+                    likeCount.textContent = data.like_count;
+                    
+                    // Update icon and data attribute
+                    if (data.liked) {
+                        likeIcon.className = 'fas fa-heart text-danger';
+                        this.dataset.liked = 'true';
+                        
+                        // Add heart animation
+                        this.classList.add('animate-heart');
+                        setTimeout(() => this.classList.remove('animate-heart'), 300);
+                    } else {
+                        likeIcon.className = 'fas fa-heart text-muted';
+                        this.dataset.liked = 'false';
+                    }
+                    
+                    // Show success toast
+                    showToast('Success!', data.liked ? 'Post liked!' : 'Post unliked!', 'success');
+                } else {
+                    throw new Error(data.message || 'Unknown error occurred');
+                }
+            })
+            .catch(error => {
+                console.error('Error details:', error);
+                
+                // Restore original icon
+                likeIcon.className = originalIcon;
+                
+                // Show error toast
+                showToast('Error', 'Failed to update like. Please try again.', 'error');
+            })
+            .finally(() => {
+                // Re-enable button
+                this.disabled = false;
+            });
+        });
+    });
+    
+    // Toast notification function
+    function showToast(title, message, type) {
+        const toast = document.createElement('div');
+        toast.className = `toast-notification toast-${type}`;
+        toast.innerHTML = `
+            <strong>${title}</strong><br>
+            ${message}
+        `;
+        
+        document.body.appendChild(toast);
+        
+        // Auto remove after 3 seconds
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
+    }
+});
+</script>
+
+<style>
+.like-btn {
+    border: none !important;
+    background: none !important;
+    transition: transform 0.2s ease;
+}
+
+.like-btn:hover {
+    transform: scale(1.1);
+}
+
+.like-btn:disabled {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.animate-heart {
+    animation: heartBeat 0.3s ease-in-out;
+}
+
+@keyframes heartBeat {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+}
+
+.card-footer {
+    border-top: 1px solid rgba(0,0,0,0.125);
+}
+
+.toast-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    border-radius: 5px;
+    z-index: 1000;
+    animation: slideIn 0.3s ease;
+    color: white;
+    font-weight: 500;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.toast-success {
+    background: #28a745;
+}
+
+.toast-error {
+    background: #dc3545;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+}
+
+.dropdown-toggle::after {
+    display: none;
+}
+
+.btn-link:hover {
+    text-decoration: none;
+}
+
+.card {
+    transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15) !important;
+}
+</style>
+
+{% endblock %}

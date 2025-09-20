@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% block title %}Teacher Analytics{% endblock %}
+
+{% block content %}
+<h2>📊 My Subject Performance Analytics</h2>
+
+<canvas id="subjectPerformanceChart" width="800" height="400"></canvas>
+
+{% if subject_chart_data %}
+  {{ subject_chart_data|json_script:"subject-chart-data" }}
+{% else %}
+  <p>No performance data available yet.</p>
+{% endif %}
+
+<h3>📌 Top 10 Students by Subject</h3>
+{% if top_students_by_subject %}
+  {% for subject, students in top_students_by_subject.items %}
+    <h4>{{ subject }}</h4>
+    <ol>
+      {% for student, grade in students %}
+        <li>{{ student }} - {{ grade }}%</li>
+      {% endfor %}
+    </ol>
+  {% empty %}
+    <p>No student ranking data found.</p>
+  {% endfor %}
+{% else %}
+  <p>No top student data available.</p>
+{% endif %}
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const subjectChartData = JSON.parse(document.getElementById("subject-chart-data").textContent || '{}');
+  const chartLabels = Object.keys(subjectChartData);
+  const chartValues = Object.values(subjectChartData);
+
+  if (chartLabels.length > 0) {
+    new Chart(document.getElementById('subjectPerformanceChart'), {
+      type: 'bar',
+      data: {
+        labels: chartLabels,
+        datasets: [{
+          label: 'Average Grade (%)',
+          data: chartValues,
+          backgroundColor: '#36A2EB',
+          borderColor: '#1F78B4',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Average Performance by Subject'
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: 100,
+            title: {
+              display: true,
+              text: 'Grade (%)'
+            }
+          }
+        }
+      }
+    });
+  }
+</script>
+{% endblock %}

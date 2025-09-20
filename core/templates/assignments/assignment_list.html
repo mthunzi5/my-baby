@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Assignments - {{ subject.name }}{% endblock %}
+{% block content %}
+<h2>📚 Assignments for {{ subject.name }}</h2>
+
+<ul>
+  {% for assignment in assignments %}
+    <li>
+      <strong>{{ assignment.title }}</strong> (Due: {{ assignment.due_date|date:"Y-m-d H:i" }})
+      <br>{{ assignment.description|linebreaks }}
+      {% if assignment.instructions_file %}
+        <br><a href="{{ assignment.instructions_file.url }}" target="_blank">📎 View Instructions</a>
+      {% endif %}
+      <br>
+      {% if user.role == 'student' %}
+        {% if assignment.due_date > now %}
+          <a href="{% url 'submit_assignment' assignment.id %}">📝 Submit</a>
+        {% else %}
+          <span style="color: gray;">⏰ Deadline Passed</span>
+        {% endif %}
+      {% endif %}
+    </li>
+    <hr>
+  {% empty %}
+    <p>No assignments found.</p>
+  {% endfor %}
+</ul>
+{% endblock %}

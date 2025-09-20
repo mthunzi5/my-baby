@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Tests in {{ subject.name }}{% endblock %}
+{% block content %}
+<h2>Tests for {{ subject.name }}</h2>
+
+{% if user.role == "teacher" %}
+  <a href="{% url 'create_test' subject.id %}">+ Create Test</a>
+{% endif %}
+
+<ul>
+  {% for test in tests %}
+    <li>
+      <strong>{{ test.title }}</strong> - {{ test.date }}
+      {% if user.role == "teacher" %}
+        | <a href="{% url 'add_questions' test.id %}">Add Questions</a>
+        {% if not test.is_posted %}
+        | <a href="{% url 'post_test' test.id %}">Post</a>
+        {% endif %}
+        {% if test.is_posted %}
+        | {% if not test.open %}
+            <a href="{% url 'open_test' test.id %}">Open</a>
+          {% else %}
+            <a href="{% url 'close_test' test.id %}">Close</a>
+          {% endif %}
+        {% endif %}
+        | <a href="{% url 'view_test_submissions' test.id %}">Submissions</a>
+      {% elif user.role == "student" and test.is_posted and test.open %}
+        | <a href="{% url 'write_test' test.id %}">Write Test</a>
+      {% endif %}
+    </li>
+  {% empty %}
+    <li>No tests found for this subject.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

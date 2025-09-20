@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}Global Feed{% endblock %}
+
+{% block content %}
+<h2>🌐 Global Feed</h2>
+
+<div style="display: flex; gap: 30px;">
+  <!-- Main Post Feed -->
+  <div style="flex: 3;">
+    <a href="{% url 'create_post' %}">+ Create New Post</a>
+    <hr>
+
+    {% for post in posts %}
+      <div style="border: 1px solid #ccc; padding: 15px; margin-bottom: 20px;">
+        <p><strong>{{ post.user.username }}</strong> • {{ post.created_at|date:"M d, Y H:i" }}</p>
+        <p>{{ post.content|linebreaks }}</p>
+
+        {% if post.images.all %}
+          <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+            {% for image in post.images.all %}
+              <img src="{{ image.image.url }}" style="max-height: 200px;">
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <div>
+          <a href="{% url 'post_detail' post.id %}">💬 Comments ({{ post.comments.count }})</a> |
+          <form method="post" action="{% url 'react_to_post' post.id %}" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" style="border: none; background: none; color: blue;">👍 React</button>
+          </form>
+          ({{ post.reactions.count }})
+        </div>
+      </div>
+    {% empty %}
+      <p>No posts yet.</p>
+    {% endfor %}
+  </div>
+
+  <!-- Suggested Users Sidebar -->
+  <div style="flex: 1; background: #f9f9f9; padding: 15px; border-radius: 8px;">
+    <h4>👥 Suggested Users</h4>
+    {% for user in suggested_users %}
+      <div style="margin-bottom: 10px;">
+        <a href="{% url 'user_profile' user.username %}">@{{ user.username }}</a>
+      </div>
+    {% empty %}
+      <p>No suggestions available.</p>
+    {% endfor %}
+    <div style="margin-top: 10px;">
+      <a href="{% url 'all_users' %}">🔍 View All Users</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

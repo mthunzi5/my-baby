@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>➕ Create Draft</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <div class="mb-3">
+            {{ form.title.label_tag }}<br>
+            {{ form.title }}
+            {{ form.title.errors }}
+        </div>
+        <div class="mb-3">
+            {{ form.pdf_file.label_tag }}<br>
+            {{ form.pdf_file }}
+            {{ form.pdf_file.errors }}
+        </div>
+        <button type="submit" class="btn btn-primary">Start Draft</button>
+    </form>
+</div>
+{% endblock %}

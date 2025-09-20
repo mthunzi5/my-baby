@@ -1,0 +1,302 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">🔧 Admin Dashboard</h1>
+        </div>
+    </div>
+
+    <!-- Overall Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-2 col-sm-6 mb-3">
+            <div class="card bg-primary text-white h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-users fa-2x mb-2"></i>
+                    <h3>{{ total_users }}</h3>
+                    <p class="mb-0">Total Users</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 col-sm-6 mb-3">
+            <div class="card bg-info text-white h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-school fa-2x mb-2"></i>
+                    <h3>{{ total_school_admins }}</h3>
+                    <p class="mb-0">Schools</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 col-sm-6 mb-3">
+            <div class="card bg-success text-white h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-chalkboard-teacher fa-2x mb-2"></i>
+                    <h3>{{ total_teachers }}</h3>
+                    <p class="mb-0">Teachers</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 col-sm-6 mb-3">
+            <div class="card bg-warning text-white h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-user-graduate fa-2x mb-2"></i>
+                    <h3>{{ total_students }}</h3>
+                    <p class="mb-0">Students</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 col-sm-6 mb-3">
+            <div class="card bg-secondary text-white h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-user fa-2x mb-2"></i>
+                    <h3>{{ total_general_users }}</h3>
+                    <p class="mb-0">General Users</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 col-sm-6 mb-3">
+            <div class="card bg-dark text-white h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-book fa-2x mb-2"></i>
+                    <h3>{{ total_subjects }}</h3>
+                    <p class="mb-0">Total Subjects</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="card border-left-primary h-100">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Subjects</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_subjects }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-book fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card border-left-success h-100">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Total Tests</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_tests }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card border-left-info h-100">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Total Assignments</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_assignments }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-tasks fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- School Statistics Table -->
+    <div class="row">
+        <div class="col-md-8 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">📊 School Statistics</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>School Name</th>
+                                    <th>Teachers</th>
+                                    <th>Students</th>
+                                    <th>Total Users</th>
+                                    <th>Subjects</th>
+                                    <th>Tests</th>
+                                    <th>Assignments</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for school in school_stats %}
+                                <tr>
+                                    <td>{{ school.school_name }}</td>
+                                    <td><span class="badge badge-success">{{ school.teachers }}</span></td>
+                                    <td><span class="badge badge-warning">{{ school.students }}</span></td>
+                                    <td><span class="badge badge-primary">{{ school.total_users }}</span></td>
+                                    <td>{{ school.subjects }}</td>
+                                    <td>{{ school.tests }}</td>
+                                    <td>{{ school.assignments }}</td>
+                                    <td>
+                                        <a href="{% url 'list_school_admins' %}" class="btn btn-sm btn-outline-primary">View</a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="8" class="text-center">No schools found</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">🕒 Recent Activity</h6>
+                </div>
+                <div class="card-body">
+                    <h6 class="font-weight-bold">Recent Schools:</h6>
+                    {% for school in recent_schools %}
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="mr-3">
+                            <div class="icon-circle bg-primary">
+                                <i class="fas fa-school text-white"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="small text-gray-500">{{ school.date_joined|date:"M d, Y" }}</div>
+                            <div class="font-weight-bold">
+                                {% if school.first_name and school.last_name %}
+                                    {{ school.first_name }} {{ school.last_name }}'s School
+                                {% else %}
+                                    {{ school.username }}'s School
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted">No schools registered yet.</p>
+                    {% endfor %}
+
+                    <hr>
+                    <h6 class="font-weight-bold">Recent Posts:</h6>
+                    {% for post in recent_posts %}
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="mr-3">
+                            <div class="icon-circle bg-success">
+                                <i class="fas fa-comment text-white"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="small text-gray-500">{{ post.created_at|date:"M d, Y" }}</div>
+                            <div>{{ post.content|truncatechars:30 }}</div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted">No recent posts.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">⚡ Quick Actions</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-2">
+                            <a href="{% url 'create_school_admin' %}" class="btn btn-primary btn-block">
+                                <i class="fas fa-plus"></i> Create School Admin
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="{% url 'list_school_admins' %}" class="btn btn-info btn-block">
+                                <i class="fas fa-list"></i> Manage Schools
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="{% url 'post_feed' %}" class="btn btn-success btn-block">
+                                <i class="fas fa-comments"></i> View Social Feed
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="{% url 'test_email' %}" class="btn btn-warning btn-block">
+                                <i class="fas fa-envelope"></i> Test Email
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Email All Users Button (for superusers/admins) -->
+    <div class="row">
+        <div class="col-12">
+            <div class="mb-3">
+                <a href="{% url 'admin_send_email' %}" class="btn btn-outline-primary">
+                    <i class="fas fa-envelope"></i> Email All Users
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.border-left-primary {
+    border-left: 0.25rem solid #4e73df !important;
+}
+.border-left-success {
+    border-left: 0.25rem solid #1cc88a !important;
+}
+.border-left-info {
+    border-left: 0.25rem solid #36b9cc !important;
+}
+.icon-circle {
+    height: 2rem;
+    width: 2rem;
+    border-radius: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.text-gray-500 {
+    color: #858796 !important;
+}
+.text-gray-800 {
+    color: #5a5c69 !important;
+}
+.text-gray-300 {
+    color: #dddfeb !important;
+}
+.text-xs {
+    font-size: 0.7rem;
+}
+.font-weight-bold {
+    font-weight: 700 !important;
+}
+</style>
+
+{% endblock %}

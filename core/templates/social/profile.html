@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-sm-10">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body text-center">
+                    {% if profile.profile_picture %}
+                        <img src="{{ profile.profile_picture.url }}" class="rounded-circle mb-3" style="width: 120px; height: 120px; object-fit: cover;" alt="Profile Picture">
+                    {% else %}
+                        <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center mb-3 mx-auto" style="width: 120px; height: 120px;">
+                            <i class="fas fa-user text-white fa-3x"></i>
+                        </div>
+                    {% endif %}
+                    <h4 class="card-title">@{{ profile.user.username }}</h4>
+                    <p class="text-muted mb-1">{{ profile.user.first_name }} {{ profile.user.last_name }}</p>
+                    {% if profile.bio %}
+                        <p class="mb-1"><i class="fas fa-info-circle"></i> {{ profile.bio }}</p>
+                    {% endif %}
+                    {% if profile.phone %}
+                        <p class="mb-1"><i class="fas fa-phone"></i> {{ profile.phone }}</p>
+                    {% endif %}
+                    {% if profile.address %}
+                        <p class="mb-1"><i class="fas fa-map-marker-alt"></i> {{ profile.address }}</p>
+                    {% endif %}
+                    <p class="mb-2"><i class="fas fa-users"></i> <strong>Followers:</strong> {{ followers_count }}</p>
+                    <a href="{% url 'edit_profile' %}" class="btn btn-outline-primary btn-sm mb-2"><i class="fas fa-edit"></i> Edit Profile</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-sm-12">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">📝 My Posts</h5>
+                    {% if posts %}
+                        <div class="list-group">
+                        {% for post in posts %}
+                            <a href="{% url 'post_detail' post.id %}" class="list-group-item list-group-item-action flex-column align-items-start">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">{{ post.title|default:"Untitled Post" }}</h6>
+                                    <small class="text-muted">{{ post.created_at|date:"Y-m-d H:i" }}</small>
+                                </div>
+                            </a>
+                        {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No posts yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

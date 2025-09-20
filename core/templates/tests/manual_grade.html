@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load question_extras %}
+{% block title %}Grade Submission{% endblock %}
+{% block content %}
+<h2>Manual Grading: {{ submission.student.username }} - {{ submission.test.title }}</h2>
+<form method="post">
+  {% csrf_token %}
+  {% for answer in submission.answers.all %}
+    <div>
+      <p><strong>{{ answer.question.question_text }}</strong></p>
+      <p>Student Answer: {{ answer.selected_answer }}</p>
+      {% for opt in "ABCD" %}
+        <label>
+          <input type="radio" name="answer_{{ answer.id }}" value="{{ opt }}"
+            {% if answer.selected_answer == opt %}checked{% endif %}>
+          {{ answer.question|get_option:opt }}
+        </label>
+      {% endfor %}
+    </div>
+    <hr>
+  {% endfor %}
+  <button type="submit">Submit Grade</button>
+</form>
+{% endblock %}

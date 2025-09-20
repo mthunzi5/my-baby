@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Files for {{ subject.name }}{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Files for {{ subject.name }} ({{ colledge.name }})</h2>
+    {% if is_manager %}
+    <div class="card mb-4">
+        <div class="card-header">Upload File</div>
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button class="btn btn-primary">Upload</button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+    <div class="card">
+        <div class="card-header">Files</div>
+        <ul class="list-group list-group-flush">
+            {% for f in files %}
+            <li class="list-group-item">
+                <a href="{{ f.file.url }}" target="_blank">{{ f.file.name|slice:'25:' }}</a>
+                <span class="text-muted">({{ f.uploaded_by.username }}, {{ f.uploaded_at|date:'Y-m-d H:i' }})</span>
+                {% if f.description %}<br><small>{{ f.description }}</small>{% endif %}
+            </li>
+            {% empty %}
+            <li class="list-group-item text-muted">No files uploaded yet.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% load question_extras %}
+{% block title %}Write Test{% endblock %}
+
+{% block content %}
+<h2>{{ test.title }}</h2>
+
+<div>
+  <strong>Time Remaining:</strong>
+  <span id="timer">{{ duration|default:30 }}:00</span>
+</div>
+
+{% if messages %}
+  <ul class="messages">
+    {% for message in messages %}
+      <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+
+{% if already_submitted %}
+  <div class="alert alert-warning">You have already submitted this test. You cannot take it again.</div>
+{% else %}
+<form method="post" autocomplete="off" id="test-form">
+  {% csrf_token %}
+  {% for question in test.questions.all %}
+    <div>
+      <p><strong>{{ question.question_text }}</strong></p>
+      {% for opt in "ABCD" %}
+        <label>
+          <input type="radio" name="q{{ question.id }}" value="{{ opt }}"
+            {% if post_data and post_data|get_item:"q"|add:question.id|stringformat:"s" == opt %}checked{% endif %}
+            required>
+          {{ question|get_option:opt }}
+        </label><br>
+      {% endfor %}
+    </div>
+    <hr>
+  {% endfor %}
+  <button type="submit" id="submit-btn">Submit Test</button>
+</form>
+{% endif %}
+
+<noscript>
+  <div style="color:red;">
+    JavaScript is required for the test timer and auto-submit.
+  </div>
+</noscript>
+
+<script>
+  const testKey = "test_start_{{ test.id }}_{{ request.user.id }}";
+  const form = document.getElementById('test-form');
+  const timerDisplay = document.getElementById('timer');
+  const submitBtn = document.getElementById('submit-btn');
+
+  let startTime = localStorage.getItem(testKey);
+  const duration = Number('{{ duration|default_if_none:30 }}');
+
+  if (!startTime) {
+    startTime = Date.now();
+    localStorage.setItem(testKey, startTime);
+  } else {
+    startTime = parseInt(startTime);
+  }
+
+  const deadline = startTime + duration * 60 * 1000;
+
+  function updateTimer() {
+    const now = Date.now();
+    let remaining = Math.floor((deadline - now) / 1000);
+    if (remaining < 0) remaining = 0;
+    let minutes = Math.floor(remaining / 60);
+    let seconds = remaining % 60;
+    timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+    if (remaining <= 0) {
+      clearInterval(interval);
+      localStorage.removeItem(testKey);
+      if (submitBtn) submitBtn.disabled = true;
+      if (form) {
+        form.submit();
+      }
+    }
+  }
+
+  updateTimer();
+  const interval = setInterval(updateTimer, 1000);
+
+// Block re-entry after submission
+if (localStorage.getItem('test_submitted_{{ test.id }}_{{ request.user.id }}')) {
+  if (form) {
+    form.style.display = 'none';
+  }
+  timerDisplay.textContent = '00:00';
+}
+
+form && form.addEventListener('submit', function() {
+  localStorage.setItem('test_submitted_{{ test.id }}_{{ request.user.id }}', '1');
+  localStorage.removeItem(testKey);
+});
+</script>
+
+{% endblock %}

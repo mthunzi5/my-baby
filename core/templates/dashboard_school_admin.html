@@ -1,0 +1,338 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ school_name }} - Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">🏫 {{ school_name }} Dashboard</h1>
+        </div>
+    </div>
+
+    <!-- Overview Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card bg-primary text-white h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-chalkboard-teacher fa-2x mb-2"></i>
+                    <h3>{{ total_teachers }}</h3>
+                    <p class="mb-0">Teachers</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-success text-white h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-user-graduate fa-2x mb-2"></i>
+                    <h3>{{ total_students }}</h3>
+                    <p class="mb-0">Students</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-info text-white h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-book fa-2x mb-2"></i>
+                    <h3>{{ total_subjects }}</h3>
+                    <p class="mb-0">Subjects</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-warning text-white h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-chart-line fa-2x mb-2"></i>
+                    <h3>{{ grade_distribution|length }}</h3>
+                    <p class="mb-0">Active Grades</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grade Distribution & Top Performers -->
+    <div class="row mb-4">
+        <div class="col-md-4 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">📊 Students by Grade</h6>
+                </div>
+                <div class="card-body">
+                    {% for grade, count in grade_distribution.items %}
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>{{ grade }}</span>
+                        <span class="badge badge-primary">{{ count }}</span>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted">No students enrolled yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-success">🏆 Top 5 Performers by Grade</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for grade, performers in top_performers_by_grade.items %}
+                        {% if performers %}
+                        <div class="col-md-6 mb-3">
+                            <h6 class="font-weight-bold text-primary">{{ grade }}</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Rank</th>
+                                            <th>Student</th>
+                                            <th>Average</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for performer in performers %}
+                                        <tr>
+                                            <td>
+                                                {% if forloop.counter == 1 %}🥇
+                                                {% elif forloop.counter == 2 %}🥈
+                                                {% elif forloop.counter == 3 %}🥉
+                                                {% else %}{{ forloop.counter }}{% endif %}
+                                            </td>
+                                            <td>{{ performer.student.first_name }} {{ performer.student.last_name }}</td>
+                                            <td>
+                                                <span class="badge badge-success">{{ performer.average }}%</span>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                    {% if not top_performers_by_grade %}
+                    <p class="text-muted">No graded assessments yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subject Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-8 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">📚 Subject Overview</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Subject</th>
+                                    <th>Grade</th>
+                                    <th>Teachers</th>
+                                    <th>Students</th>
+                                    <th>Tests</th>
+                                    <th>Assignments</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for subject in subject_stats %}
+                                <tr>
+                                    <td>{{ subject.name }}</td>
+                                    <td><span class="badge badge-info">Grade {{ subject.grade }}</span></td>
+                                    <td><span class="badge badge-success">{{ subject.teachers }}</span></td>
+                                    <td><span class="badge badge-warning">{{ subject.students }}</span></td>
+                                    <td>{{ subject.tests }}</td>
+                                    <td>{{ subject.assignments }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-center">No subjects created yet.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Teacher Workload -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-warning">👨‍🏫 Teacher Workload</h6>
+                </div>
+                <div class="card-body">
+                    {% for teacher in teacher_workload %}
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div>
+                            <strong>{{ teacher.teacher.first_name }} {{ teacher.teacher.last_name }}</strong>
+                            <small class="d-block text-muted">{{ teacher.students }} students</small>
+                        </div>
+                        <span class="badge badge-primary">{{ teacher.subjects }} subjects</span>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted">No teachers assigned yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="card shadow h-100">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-success">📝 Recent Tests</h6>
+                </div>
+                <div class="card-body">
+                    {% for test in recent_tests %}
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="mr-3">
+                            <div class="icon-circle bg-success">
+                                <i class="fas fa-clipboard-list text-white"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="font-weight-bold">{{ test.title }}</div>
+                            <small class="text-muted">{{ test.subject.name }} - {{ test.created_at|date:"M d" }}</small>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted">No tests created yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card shadow h-100">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-info">📋 Recent Assignments</h6>
+                </div>
+                <div class="card-body">
+    {% for assignment in recent_assignments %}
+    <div class="d-flex align-items-center mb-2">
+        <div class="mr-3">
+            <div class="icon-circle bg-info">
+                <i class="fas fa-tasks text-white"></i>
+            </div>
+        </div>
+        <div>
+            <div class="font-weight-bold">{{ assignment.title }}</div>
+            <small class="text-muted">
+                {{ assignment.subject.name }} - 
+                {% if assignment.created_at %}
+                    {{ assignment.created_at|date:"M d" }}
+                {% else %}
+                    {{ assignment.due_date|date:"M d" }}
+                {% endif %}
+            </small>
+        </div>
+    </div>
+    {% empty %}
+    <p class="text-muted">No assignments created yet.</p>
+    {% endfor %}
+</div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card shadow h-100">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">👥 New Users</h6>
+                </div>
+                <div class="card-body">
+                    {% for user in recent_users %}
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="mr-3">
+                            <div class="icon-circle bg-primary">
+                                <i class="fas fa-user text-white"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="font-weight-bold">{{ user.first_name }} {{ user.last_name }}</div>
+                            <small class="text-muted">{{ user.role|capfirst }} - {{ user.date_joined|date:"M d" }}</small>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted">No new users.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">⚡ Quick Actions</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-2">
+                            <a href="{% url 'create_school_user' %}" class="btn btn-primary btn-block">
+                                <i class="fas fa-user-plus"></i> Add User
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="{% url 'subject_create' %}" class="btn btn-success btn-block">
+                                <i class="fas fa-plus"></i> Create Subject
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="{% url 'list_school_users' %}" class="btn btn-info btn-block">
+                                <i class="fas fa-users"></i> Manage Users
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="{% url 'subject_list' %}" class="btn btn-warning btn-block">
+                                <i class="fas fa-book"></i> View Subjects
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <a href="{% url 'school_send_email' %}" class="btn btn-outline-primary">
+            <i class="fas fa-envelope"></i> Email All Students
+        </a>
+    </div>
+</div>
+
+<style>
+.icon-circle {
+    height: 2rem;
+    width: 2rem;
+    border-radius: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.border-left-primary {
+    border-left: 0.25rem solid #4e73df !important;
+}
+.border-left-success {
+    border-left: 0.25rem solid #1cc88a !important;
+}
+.border-left-info {
+    border-left: 0.25rem solid #36b9cc !important;
+}
+.text-xs {
+    font-size: 0.7rem;
+}
+</style>
+
+{% endblock %}

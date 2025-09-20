@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block title %}{{ user_profile.username }}'s Profile{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <!-- Profile Info Section -->
+        <div class="col-md-4 col-sm-10 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    {% if user_profile.profile.profile_picture %}
+                        <img src="{{ user_profile.profile.profile_picture.url }}" class="rounded-circle mb-3 profile-img-clickable"
+                             style="width: 120px; height: 120px; object-fit: cover; cursor:pointer;"
+                             alt="Profile Picture"
+                             data-img="{{ user_profile.profile.profile_picture.url }}">
+                    {% else %}
+                        <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center mb-3 mx-auto" style="width: 120px; height: 120px;">
+                            <i class="fas fa-user text-white fa-3x"></i>
+                        </div>
+                    {% endif %}
+                    <h4 class="card-title">@{{ user_profile.username }}</h4>
+                    <p class="text-muted mb-1">{{ user_profile.first_name }} {{ user_profile.last_name }}</p>
+                    <p class="mb-1"><i class="fas fa-info-circle"></i> {{ user_profile.profile.bio|default:"No bio yet." }}</p>
+                    <p class="mb-1"><i class="fas fa-map-marker-alt"></i> {{ user_profile.profile.address|default:"N/A" }}</p>
+                    <p class="mb-1"><i class="fas fa-phone"></i> {{ user_profile.profile.phone|default:"N/A" }}</p>
+                    <p class="mb-1"><i class="fas fa-users"></i> <strong>Followers:</strong> {{ followers_count }}</p>
+                    <p class="mb-3"><i class="fas fa-user-friends"></i> <strong>Following:</strong> {{ following_count }}</p>
+                    {% if request.user != user_profile %}
+                        <form method="post" action="{% url 'toggle_follow' user_profile.username %}" style="display: inline;">
+                            {% csrf_token %}
+                            {% if is_following %}
+                                <button type="submit" class="btn btn-outline-danger btn-sm">
+                                    <i class="fas fa-user-minus"></i> Unfollow
+                                </button>
+                            {% else %}
+                                <button type="submit" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-user-plus"></i> Follow
+                                </button>
+                            {% endif %}
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Posts Section -->
+        <div class="col-md-8 col-sm-12">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">{{ user_profile.username }}'s Posts</h5>
+                    {% for post in posts %}
+                        <a href="{% url 'post_detail' post.id %}" class="text-decoration-none text-dark">
+                            <div class="card mb-3 post-hover">
+                                <div class="card-body">
+                                    <p class="mb-2">{{ post.content|truncatewords:30 }}</p>
+                                    {% if post.image %}
+                                        <img src="{{ post.image.url }}" class="img-fluid rounded mb-2 post-img-clickable"
+                                             style="max-height: 250px; object-fit: contain; cursor:pointer;"
+                                             alt="Post Image"
+                                             data-img="{{ post.image.url }}">
+                                    {% endif %}
+                                    <small class="text-muted">Posted {{ post.created_at|timesince }} ago</small>
+                                </div>
+                            </div>
+                        </a>
+                    {% empty %}
+                        <p class="text-muted">No posts yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for viewing images -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body text-center">
+        <img id="modalImage" src="" class="img-fluid rounded" alt="Full Image">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary w-100" data-bs-dismiss="modal">Back to Profile</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+    .post-hover:hover {
+        background: #f8f9fa;
+        transition: background 0.2s;
+        cursor: pointer;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // For Bootstrap 5 modal
+    var imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
+    var modalImage = document.getElementById('modalImage');
+
+    // Profile image click
+    document.querySelectorAll('.profile-img-clickable').forEach(function(img) {
+        img.addEventListener('click', function() {
+            modalImage.src = this.getAttribute('data-img');
+            imageModal.show();
+        });
+    });
+
+    // Post image click
+    document.querySelectorAll('.post-img-clickable').forEach(function(img) {
+        img.addEventListener('click', function(event) {
+            event.preventDefault();
+            modalImage.src = this.getAttribute('data-img');
+            imageModal.show();
+        });
+    });
+});
+</script>
+{% endblock %}

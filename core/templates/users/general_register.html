@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<div class="register-container">
+    <div class="register-card">
+        <h2 class="register-title">📝 General User Registration</h2>
+        <form method="post" class="register-form">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="register-btn">Register</button>
+        </form>
+        <p class="register-login-link">Already have an account? <a href="{% url 'login' %}">Login here</a>.</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+    body {
+        background: #fff !important;
+    }
+    .register-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fff;
+    }
+    .register-card {
+        background: #fff;
+        border-radius: 18px;
+        box-shadow: 0 4px 24px rgba(37,117,252,0.08), 0 1.5px 8px rgba(0,0,0,0.04);
+        border: 2px solid #eee;
+        padding: 36px 32px 28px 32px;
+        max-width: 420px;
+        width: 100%;
+        margin: 24px 0;
+        transition: box-shadow 0.3s, border 0.3s;
+        position: relative;
+    }
+    .register-card:hover {
+        border: 2px solid gold;
+        box-shadow: 0 0 0 4px gold, 0 4px 24px rgba(37,117,252,0.08);
+    }
+    .register-title {
+        text-align: center;
+        color: #2575fc;
+        font-weight: 700;
+        margin-bottom: 24px;
+    }
+    .register-form label {
+        font-weight: 500;
+        color: #222;
+    }
+    .register-form input {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 15px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        font-size: 1em;
+        background: #f9f9f9;
+        transition: border 0.2s;
+    }
+    .register-form input:focus {
+        border: 1.5px solid #2575fc;
+        outline: none;
+    }
+    .register-btn {
+        width: 100%;
+        padding: 12px;
+        border-radius: 6px;
+        background: linear-gradient(90deg, #2575fc, #fc2525, #25fc6a);
+        color: #fff;
+        font-weight: bold;
+        border: none;
+        font-size: 1.1em;
+        cursor: pointer;
+        margin-top: 8px;
+        transition: background 0.3s;
+    }
+    .register-btn:hover {
+        background: #fc2525;
+        color: #fff;
+    }
+    .register-login-link {
+        text-align: center;
+        margin-top: 18px;
+        font-size: 0.98em;
+    }
+    .register-login-link a {
+        color: #2575fc;
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .register-login-link a:hover {
+        color: #fc2525;
+        text-decoration: underline;
+    }
+    @media (max-width: 600px) {
+        .register-card {
+            padding: 18px 6px 14px 6px;
+            max-width: 100vw;
+        }
+    }
+</style>
+{% endblock %}

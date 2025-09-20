@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h2>Files for {{ subject.name }}</h2>
+  <ul>
+    {% for file in files %}
+      <li><a href="{{ file.file.url }}" target="_blank">{{ file.title }}</a> ({{ file.uploaded_at|date:"Y-m-d H:i" }})</li>
+    {% empty %}
+      <li>No files available.</li>
+    {% endfor %}
+  </ul>
+{% endblock %}

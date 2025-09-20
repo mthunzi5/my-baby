@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>🔎 Search</h2>
+    <form method="get" action="{% url 'global_search' %}" class="mb-4">
+        <div class="input-group">
+            <input type="text" name="q" class="form-control" placeholder="Search posts or users..." value="{{ query }}">
+            <button class="btn btn-primary" type="submit">Search</button>
+        </div>
+    </form>
+    {% if query %}
+        <h5>Results for "<strong>{{ query }}</strong>":</h5>
+        <hr>
+        <h6>Posts</h6>
+        {% if posts %}
+            <ul class="list-group mb-3">
+                {% for post in posts %}
+                    <li class="list-group-item">
+                        <a href="{% url 'post_detail' post.id %}">{{ post.content|truncatewords:8 }}</a>
+                        <small class="text-muted d-block">{{ post.created_at|date:"M d, Y H:i" }}</small>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-muted">No matching posts found.</p>
+        {% endif %}
+        <h6>Users</h6>
+        {% if users %}
+            <ul class="list-group">
+                {% for user in users %}
+                    <li class="list-group-item">
+                        <a href="{% url 'user_profile' user.username %}">
+                            {{ user.get_full_name|default:user.username }} ({{ user.email }})
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-muted">No matching users found.</p>
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}

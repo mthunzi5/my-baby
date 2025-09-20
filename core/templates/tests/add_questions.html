@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Add Questions{% endblock %}
+{% block content %}
+<h2>Add Question to Test: {{ test.title }}</h2>
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Add Question</button>
+</form>
+
+<hr>
+<h3>Existing Questions:</h3>
+<ul>
+  {% for question in test.questions.all %}
+    <li>{{ question.question_text }}</li>
+  {% empty %}
+    <li>No questions added yet.</li>
+  {% endfor %}
+</ul>
+
+{% if can_post %}
+  <form method="post" action="{% url 'post_test' test.id %}">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-success">Post Test</button>
+  </form>
+{% endif %}
+
+{% endblock %}
