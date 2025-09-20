@@ -5,6 +5,7 @@ from django.dispatch import receiver
 from django.conf import settings
 from django.core.validators import FileExtensionValidator
 from django.contrib.auth import get_user_model
+import dj_database_url
 
 from django.utils import timezone
 from .models_site_logo import SiteLogo
