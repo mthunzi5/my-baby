@@ -29,7 +29,8 @@ SECRET_KEY = 'django-insecure-h7mh*oj#)^&2a)q1-onp67j1stk0@y!7ho10tjmf&7oj4j5(qu
 DEBUG = True
 
 ALLOWED_HOSTS = ['my-baby-fmo9.onrender.com', 'localhost']
-
+DEFAULT_FROM_EMAIL = 'no-reply@my-global-future.com'
+CSRF_TRUSTED_ORIGINS = ['https://my-baby-fmo9.onrender.com']
 
 # Application definition
 
