@@ -1,12 +1,32 @@
 {% extends "base.html" %}
-{% block title %}Create/Edit Subject{% endblock %}
+{% block title %}{% if form.instance.pk %}Edit{% else %}Create{% endif %} Subject{% endblock %}
 
 {% block content %}
-  <h2>{% if form.instance.pk %}Edit{% else %}Create{% endif %} Subject</h2>
-  <form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">{% if form.instance.pk %}Update{% else %}Create{% endif %}</button>
-  </form>
-  <p><a href="{% url 'subject_list' %}">← Back to Subjects</a></p>
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white d-flex align-items-center">
+                    <i class="fas fa-book fa-lg me-2"></i>
+                    <span class="fw-bold">{% if form.instance.pk %}Edit{% else %}Create{% endif %} Subject</span>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" novalidate>
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <button type="submit" class="btn btn-success w-100 mt-3">
+                            <i class="fas fa-save me-1"></i>
+                            {% if form.instance.pk %}Update{% else %}Create{% endif %}
+                        </button>
+                    </form>
+                    <p class="mt-3">
+                        <a href="{% url 'subject_list' %}" class="btn btn-link">
+                            <i class="fas fa-arrow-left"></i> Back to Subjects
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

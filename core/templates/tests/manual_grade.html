@@ -2,23 +2,46 @@
 {% load question_extras %}
 {% block title %}Grade Submission{% endblock %}
 {% block content %}
-<h2>Manual Grading: {{ submission.student.username }} - {{ submission.test.title }}</h2>
-<form method="post">
-  {% csrf_token %}
-  {% for answer in submission.answers.all %}
-    <div>
-      <p><strong>{{ answer.question.question_text }}</strong></p>
-      <p>Student Answer: {{ answer.selected_answer }}</p>
-      {% for opt in "ABCD" %}
-        <label>
-          <input type="radio" name="answer_{{ answer.id }}" value="{{ opt }}"
-            {% if answer.selected_answer == opt %}checked{% endif %}>
-          {{ answer.question|get_option:opt }}
-        </label>
-      {% endfor %}
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-10 col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white d-flex align-items-center">
+                    <i class="fas fa-clipboard-check fa-lg me-2"></i>
+                    <span class="fw-bold">Manual Grading: {{ submission.student.username }} - {{ submission.test.title }}</span>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        {% for answer in submission.answers.all %}
+                            <div class="mb-4">
+                                <p class="fw-bold"><i class="fas fa-question-circle text-primary me-1"></i>{{ answer.question.question_text }}</p>
+                                <p>
+                                    <span class="text-muted">Student Answer:</span>
+                                    <span class="badge bg-info text-dark">{{ answer.selected_answer }}</span>
+                                </p>
+                                <div class="ms-2">
+                                    {% for opt in "ABCD" %}
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="answer_{{ answer.id }}" value="{{ opt }}"
+                                                id="answer_{{ answer.id }}_{{ opt }}"
+                                                {% if answer.selected_answer == opt %}checked{% endif %}>
+                                            <label class="form-check-label" for="answer_{{ answer.id }}_{{ opt }}">
+                                                {{ answer.question|get_option:opt }}
+                                            </label>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <hr>
+                        {% endfor %}
+                        <button type="submit" class="btn btn-success w-100 mt-3">
+                            <i class="fas fa-check me-1"></i> Submit Grade
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-    <hr>
-  {% endfor %}
-  <button type="submit">Submit Grade</button>
-</form>
+</div>
 {% endblock %}

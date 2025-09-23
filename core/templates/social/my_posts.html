@@ -1,21 +1,38 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>📝 My Posts</h2>
-<a href="{% url 'create_post' %}">+ Create New Post</a>
-<hr>
-{% for post in posts %}
-    <div style="border:1px solid #ccc;padding:10px;margin-bottom:20px;">
-        <h4>{{ post.created_at|date:"M d, Y H:i" }}</h4>
-        <p>{{ post.content }}</p>
-        {% if post.image %}
-            <img src="{{ post.image.url }}" alt="Post image" style="max-width:300px;">
-        {% endif %}
-        <br>
-        <a href="{% url 'post_detail' post.id %}">View</a>
-        | <a href="{% url 'edit_post' post.id %}">Edit</a>
-        | <a href="{% url 'delete_post' post.id %}">Delete</a>
+<div class="container my-4">
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+        <h2 class="mb-0"><i class="fas fa-pen-nib me-2"></i>My Posts</h2>
+        <a href="{% url 'create_post' %}" class="btn btn-success">
+            <i class="fas fa-plus"></i> Create New Post
+        </a>
     </div>
-{% empty %}
-    <p>You have not created any posts yet.</p>
-{% endfor %}
+    <hr>
+    {% for post in posts %}
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h6 class="text-muted mb-2">
+                    <i class="fas fa-calendar-alt me-1"></i>{{ post.created_at|date:"M d, Y H:i" }}
+                </h6>
+                <p>{{ post.content }}</p>
+                {% if post.image %}
+                    <img src="{{ post.image.url }}" alt="Post image" class="img-fluid rounded mb-2" style="max-width: 300px;">
+                {% endif %}
+                <div class="mt-2">
+                    <a href="{% url 'post_detail' post.id %}" class="btn btn-sm btn-outline-primary me-1">
+                        <i class="fas fa-eye"></i> View
+                    </a>
+                    <a href="{% url 'edit_post' post.id %}" class="btn btn-sm btn-outline-info me-1">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>
+                    <a href="{% url 'delete_post' post.id %}" class="btn btn-sm btn-outline-danger">
+                        <i class="fas fa-trash"></i> Delete
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="alert alert-info">You have not created any posts yet.</div>
+    {% endfor %}
+</div>
 {% endblock %}

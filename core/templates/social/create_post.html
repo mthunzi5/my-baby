@@ -2,13 +2,28 @@
 {% block title %}Create Post{% endblock %}
 
 {% block content %}
-<h2>📝 Create a New Post</h2>
-
-<form method="post" enctype="multipart/form-data">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Post</button>
-</form>
-
-<a href="{% url 'feed' %}">⬅️ Back to Feed</a>
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white d-flex align-items-center">
+                    <i class="fas fa-pen-nib fa-lg me-2"></i>
+                    <span class="fw-bold">Create a New Post</span>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" novalidate>
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <button type="submit" class="btn btn-success w-100">
+                            <i class="fas fa-paper-plane me-1"></i> Post
+                        </button>
+                    </form>
+                    <a href="{% url 'feed' %}" class="btn btn-link mt-3">
+                        <i class="fas fa-arrow-left"></i> Back to Feed
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

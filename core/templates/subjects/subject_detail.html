@@ -3,42 +3,85 @@
 {% block title %}{{ subject.name }}{% endblock %}
 
 {% block content %}
-<h2>{{ subject.name }}</h2>
-<p>{{ subject.description }}</p>
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-10">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white d-flex align-items-center">
+                    <i class="fas fa-book-open fa-lg me-2"></i>
+                    <span class="fw-bold">{{ subject.name }}</span>
+                </div>
+                <div class="card-body">
+                    <p class="mb-3">{{ subject.description }}</p>
 
-{% if user.role == 'teacher' %}
-  <div>
-    <strong>🔧 Teacher Tools:</strong><br>
-    <a href="{% url 'upload_subject_file' subject.id %}">📤 Upload File</a> |
-    <a href="{% url 'create_test' subject.id %}">🧪 Create Test</a> |
-    <a href="{% url 'subject_tests' subject.id %}">🛠️ Manage Tests</a> |
-    <a href="{% url 'subject_threads' subject.id %}">💬 View Discussions</a> |
-    <a href="{% url 'teacher_assignment_list' subject.id %}">📘 View Assignments</a> |
-    <a href="{% url 'create_assignment' subject.id %}">➕ Create Assignment</a>
-  </div>
-{% elif user.role == 'student' %}
-  <div>
-    <strong>📚 Student Options:</strong><br>
-    <a href="{% url 'subject_tests' subject.id %}">🧪 View Tests</a> |
-    <a href="{% url 'subject_threads' subject.id %}">💬 View Discussions</a> |
-    <a href="{% url 'student_assignment_list' subject.id %}">📘 View Assignments</a>
-  </div>
-{% endif %}
+                    {% if user.role == 'teacher' %}
+                        <div class="mb-3">
+                            <span class="fw-bold"><i class="fas fa-tools me-1"></i> Teacher Tools:</span>
+                            <div class="d-flex flex-wrap gap-2 mt-2">
+                                <a href="{% url 'upload_subject_file' subject.id %}" class="btn btn-outline-secondary btn-sm">
+                                    <i class="fas fa-upload"></i> Upload File
+                                </a>
+                                <a href="{% url 'create_test' subject.id %}" class="btn btn-outline-info btn-sm">
+                                    <i class="fas fa-vial"></i> Create Test
+                                </a>
+                                <a href="{% url 'subject_tests' subject.id %}" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-tasks"></i> Manage Tests
+                                </a>
+                                <a href="{% url 'subject_threads' subject.id %}" class="btn btn-outline-success btn-sm">
+                                    <i class="fas fa-comments"></i> Discussions
+                                </a>
+                                <a href="{% url 'teacher_assignment_list' subject.id %}" class="btn btn-outline-warning btn-sm">
+                                    <i class="fas fa-book"></i> Assignments
+                                </a>
+                                <a href="{% url 'create_assignment' subject.id %}" class="btn btn-outline-dark btn-sm">
+                                    <i class="fas fa-plus"></i> New Assignment
+                                </a>
+                            </div>
+                        </div>
+                    {% elif user.role == 'student' %}
+                        <div class="mb-3">
+                            <span class="fw-bold"><i class="fas fa-user-graduate me-1"></i> Student Options:</span>
+                            <div class="d-flex flex-wrap gap-2 mt-2">
+                                <a href="{% url 'subject_tests' subject.id %}" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-vial"></i> View Tests
+                                </a>
+                                <a href="{% url 'subject_threads' subject.id %}" class="btn btn-outline-success btn-sm">
+                                    <i class="fas fa-comments"></i> Discussions
+                                </a>
+                                <a href="{% url 'student_assignment_list' subject.id %}" class="btn btn-outline-warning btn-sm">
+                                    <i class="fas fa-book"></i> Assignments
+                                </a>
+                            </div>
+                        </div>
+                    {% endif %}
 
-<hr>
+                    <hr>
 
-<h3>📂 Files</h3>
-<ul>
-  {% for file in files %}
-    <li>
-      <a href="{{ file.file.url }}" target="_blank">{{ file.title }}</a>
-      ({{ file.uploaded_by.username }}, {{ file.uploaded_at|date:"Y-m-d H:i" }})
-      {% if user == file.uploaded_by or user.role == 'school_admin' %}
-        | <a href="{% url 'delete_subject_file' subject.id file.id %}">🗑️ Delete</a>
-      {% endif %}
-    </li>
-  {% empty %}
-    <li>No files uploaded for this subject.</li>
-  {% endfor %}
-</ul>
+                    <h5 class="mb-3"><i class="fas fa-folder-open me-2"></i>Files</h5>
+                    <ul class="list-group">
+                        {% for file in files %}
+                            <li class="list-group-item d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+                                <div>
+                                    <a href="{{ file.file.url }}" target="_blank" class="fw-bold">
+                                        <i class="fas fa-file-alt text-secondary me-1"></i>{{ file.title }}
+                                    </a>
+                                    <small class="text-muted ms-2">
+                                        ({{ file.uploaded_by.username }}, {{ file.uploaded_at|date:"Y-m-d H:i" }})
+                                    </small>
+                                </div>
+                                {% if user == file.uploaded_by or user.role == 'school_admin' %}
+                                    <a href="{% url 'delete_subject_file' subject.id file.id %}" class="btn btn-sm btn-outline-danger mt-2 mt-md-0">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </a>
+                                {% endif %}
+                            </li>
+                        {% empty %}
+                            <li class="list-group-item text-muted">No files uploaded for this subject.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

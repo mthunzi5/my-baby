@@ -1,10 +1,25 @@
 {% extends "base.html" %}
 {% block title %}Create Test{% endblock %}
 {% block content %}
-<h2>Create a Test for {{ subject.name }}</h2>
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Create Test</button>
-</form>
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white d-flex align-items-center">
+                    <i class="fas fa-vial fa-lg me-2"></i>
+                    <span class="fw-bold">Create a Test for {{ subject.name }}</span>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <button type="submit" class="btn btn-success w-100 mt-3">
+                            <i class="fas fa-plus me-1"></i> Create Test
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

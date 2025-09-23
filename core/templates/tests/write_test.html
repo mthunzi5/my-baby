@@ -3,50 +3,71 @@
 {% block title %}Write Test{% endblock %}
 
 {% block content %}
-<h2>{{ test.title }}</h2>
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-10">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white d-flex align-items-center justify-content-between">
+                    <span>
+                        <i class="fas fa-pen fa-lg me-2"></i>
+                        <span class="fw-bold">{{ test.title }}</span>
+                    </span>
+                    <span>
+                        <i class="fas fa-clock me-1"></i>
+                        <strong>Time Remaining:</strong>
+                        <span id="timer">{{ duration|default:30 }}:00</span>
+                    </span>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        <ul class="messages">
+                            {% for message in messages %}
+                                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
 
-<div>
-  <strong>Time Remaining:</strong>
-  <span id="timer">{{ duration|default:30 }}:00</span>
-</div>
+                    {% if already_submitted %}
+                        <div class="alert alert-warning">You have already submitted this test. You cannot take it again.</div>
+                    {% else %}
+                        <form method="post" autocomplete="off" id="test-form">
+                            {% csrf_token %}
+                            {% for question in test.questions.all %}
+                                <div class="mb-4">
+                                    <p class="fw-bold"><i class="fas fa-question-circle text-primary me-1"></i>{{ question.question_text }}</p>
+                                    <div class="ms-3">
+                                        {% for opt in "ABCD" %}
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="q{{ question.id }}" value="{{ opt }}"
+                                                    id="q{{ question.id }}_{{ opt }}"
+                                                    {% if post_data and post_data|get_item:"q"|add:question.id|stringformat:"s" == opt %}checked{% endif %}
+                                                    required>
+                                                <label class="form-check-label" for="q{{ question.id }}_{{ opt }}">
+                                                    {{ question|get_option:opt }}
+                                                </label>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <hr>
+                            {% endfor %}
+                            <button type="submit" id="submit-btn" class="btn btn-success w-100">
+                                <i class="fas fa-paper-plane me-1"></i> Submit Test
+                            </button>
+                        </form>
+                    {% endif %}
 
-{% if messages %}
-  <ul class="messages">
-    {% for message in messages %}
-      <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-    {% endfor %}
-  </ul>
-{% endif %}
-
-
-{% if already_submitted %}
-  <div class="alert alert-warning">You have already submitted this test. You cannot take it again.</div>
-{% else %}
-<form method="post" autocomplete="off" id="test-form">
-  {% csrf_token %}
-  {% for question in test.questions.all %}
-    <div>
-      <p><strong>{{ question.question_text }}</strong></p>
-      {% for opt in "ABCD" %}
-        <label>
-          <input type="radio" name="q{{ question.id }}" value="{{ opt }}"
-            {% if post_data and post_data|get_item:"q"|add:question.id|stringformat:"s" == opt %}checked{% endif %}
-            required>
-          {{ question|get_option:opt }}
-        </label><br>
-      {% endfor %}
+                    <noscript>
+                        <div class="alert alert-danger mt-3">
+                            <i class="fas fa-exclamation-triangle me-1"></i>
+                            JavaScript is required for the test timer and auto-submit.
+                        </div>
+                    </noscript>
+                </div>
+            </div>
+        </div>
     </div>
-    <hr>
-  {% endfor %}
-  <button type="submit" id="submit-btn">Submit Test</button>
-</form>
-{% endif %}
-
-<noscript>
-  <div style="color:red;">
-    JavaScript is required for the test timer and auto-submit.
-  </div>
-</noscript>
+</div>
 
 <script>
   const testKey = "test_start_{{ test.id }}_{{ request.user.id }}";
@@ -87,18 +108,17 @@
   updateTimer();
   const interval = setInterval(updateTimer, 1000);
 
-// Block re-entry after submission
-if (localStorage.getItem('test_submitted_{{ test.id }}_{{ request.user.id }}')) {
-  if (form) {
-    form.style.display = 'none';
+  // Block re-entry after submission
+  if (localStorage.getItem('test_submitted_{{ test.id }}_{{ request.user.id }}')) {
+    if (form) {
+      form.style.display = 'none';
+    }
+    timerDisplay.textContent = '00:00';
   }
-  timerDisplay.textContent = '00:00';
-}
 
-form && form.addEventListener('submit', function() {
-  localStorage.setItem('test_submitted_{{ test.id }}_{{ request.user.id }}', '1');
-  localStorage.removeItem(testKey);
-});
+  form && form.addEventListener('submit', function() {
+    localStorage.setItem('test_submitted_{{ test.id }}_{{ request.user.id }}', '1');
+    localStorage.removeItem(testKey);
+  });
 </script>
-
 {% endblock %}

@@ -1,12 +1,27 @@
 {% extends 'base.html' %}
-{% block title %}Add Question{% endblock %}
+{% block title %}{{ form.instance.id|yesno:"Edit Question,Add Question" }}{% endblock %}
 {% block content %}
-<h2>{{ form.instance.id|yesno:"Edit Question,Add Question" }}</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Save Question</button>
-</form>
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white d-flex align-items-center">
+                    <i class="fas fa-question-circle fa-lg me-2"></i>
+                    <span>{{ form.instance.id|yesno:"Edit Question,Add Question" }}</span>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <button type="submit" class="btn btn-success w-100 mt-3">
+                            <i class="fas fa-save me-1"></i> Save Question
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 <!-- This template allows users to add or edit a question related to a test. -->
 <!-- The form is dynamically generated based on the instance of the question being edited or created. -->
