@@ -53,7 +53,7 @@ INSTALLED_APPS = [
     
 ]
 # Add site id for django.contrib.sites
-SITE_ID = 1
+SITE_ID = 2
 
 # Authentication backends for allauth
 AUTHENTICATION_BACKENDS = [
