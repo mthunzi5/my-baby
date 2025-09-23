@@ -31,6 +31,7 @@ from allauth.socialaccount.providers import registry
 from allauth.socialaccount.models import SocialApp
 import ssl
 import certifi
+from django.contrib.auth.views import PasswordResetView
 
 from pdf2docx import Converter
 from docx2pdf import convert as docx2pdf_convert
@@ -2225,3 +2226,20 @@ def global_search(request):
         'posts': posts,
         'users': users,
     })
+
+
+
+
+
+
+
+class CustomPasswordResetView(PasswordResetView):
+    email_template_name = 'registration/password_reset_email.html'
+    subject_template_name = 'registration/password_reset_subject.txt'
+    success_url = '/accounts/password_reset/done/'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['domain'] = 'my-baby-fmo9.onrender.com'  # your real domain
+        context['site_name'] = 'My Baby LMS'
+        return context
